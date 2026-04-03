@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import { AnnotationSidebar } from "../src/components/AnnotationSidebar";
-import type { Annotation } from "../src/types";
+import { AnnotationSidebar } from "./AnnotationSidebar";
+import type { Annotation } from "../../types";
 
 const makeAnnotation = (overrides: Partial<Annotation> = {}): Annotation => ({
   id: "ann-1",

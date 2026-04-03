@@ -1,8 +1,8 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { useAnnotations } from "../src/hooks/useAnnotations";
+import { useAnnotations } from "./useAnnotations";
 
-vi.mock("../src/utils/range-utils", () => ({
+vi.mock("../../utils/range-utils", () => ({
   serializeRange: vi.fn(() => ({
     startContainerPath: [0, 0],
     startOffset: 0,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { serializeRange, highlightRange } from "../src/utils/range-utils";
+import { serializeRange, highlightRange } from "./range-utils";
 
 describe("serializeRange", () => {
   it("serializes a range within a single text node", () => {

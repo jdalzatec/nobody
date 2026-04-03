@@ -1,7 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
-import { MermaidBlock } from "./MermaidBlock";
+import { MermaidBlock } from "../MermaidBlock";
 
 interface MarkdownViewerProps {
   content: string;

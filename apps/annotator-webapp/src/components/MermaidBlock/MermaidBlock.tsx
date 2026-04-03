@@ -38,15 +38,15 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
 
   if (error || svg === null) {
     return (
-      <pre className="my-6 overflow-x-auto rounded-md border border-yellow-400 bg-yellow-50 p-4 text-yellow-800">
-        <code className="bg-transparent text-sm text-inherit">{code}</code>
+      <pre className="mermaid-error">
+        <code>{code}</code>
       </pre>
     );
   }
 
   return (
     <div
-      className="my-6 flex justify-center overflow-x-auto [&_svg]:max-w-full [&_svg]:h-auto"
+      className="mermaid-diagram"
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );

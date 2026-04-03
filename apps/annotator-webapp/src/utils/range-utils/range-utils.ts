@@ -1,4 +1,4 @@
-import type { SerializedRange } from "../types";
+import type { SerializedRange } from "../../types";
 
 function getNodePath(node: Node, root: Node): number[] {
   const path: number[] = [];

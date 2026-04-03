@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from "react";
-import type { Annotation } from "../types";
-import { serializeRange, highlightRange } from "../utils/range-utils";
+import type { Annotation } from "../../types";
+import { serializeRange, highlightRange } from "../../utils/range-utils";
 
 export function useAnnotations() {
   const [annotations, setAnnotations] = useState<Annotation[]>([]);

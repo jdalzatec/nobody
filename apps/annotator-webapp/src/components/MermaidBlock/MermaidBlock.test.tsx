@@ -8,7 +8,7 @@ vi.mock("mermaid", () => ({
   },
 }));
 
-import { MermaidBlock } from "../src/components/MermaidBlock";
+import { MermaidBlock } from "./MermaidBlock";
 
 describe("MermaidBlock", () => {
   it("renders fallback with raw source when mermaid.render fails", async () => {

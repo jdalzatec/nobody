@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Spin, Alert } from "antd";
 import { MarkdownViewer } from "./components/MarkdownViewer";
 import { AnnotationPopover } from "./components/AnnotationPopover";
 import { AnnotationSidebar } from "./components/AnnotationSidebar";
@@ -46,16 +47,17 @@ export function App() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center text-lg text-gray-500">
-        Loading…
+      <div className="centered-container">
+        <Spin size="large" />
+        <span>Loading…</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center text-lg font-semibold text-red-600">
-        {error}
+      <div className="centered-container">
+        <Alert type="error" message={error} showIcon />
       </div>
     );
   }
@@ -72,9 +74,9 @@ export function App() {
     : null;
 
   return (
-    <div className="mx-auto grid max-w-[1180px] grid-cols-[minmax(0,860px)_280px] gap-6 p-10">
+    <div className="app-layout">
       <div
-        className="markdown-body relative rounded-lg bg-white p-10 shadow-sm"
+        className="markdown-body markdown-column"
         ref={containerRef}
         onMouseUp={handleMouseUp}
       >

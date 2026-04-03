@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { MarkdownViewer } from "../src/components/MarkdownViewer";
+import { MarkdownViewer } from "./MarkdownViewer";
 
-vi.mock("../src/components/MermaidBlock", () => ({
+vi.mock("../MermaidBlock", () => ({
   MermaidBlock: ({ code }: { code: string }) => (
     <div data-testid="mermaid-block">{code}</div>
   ),
