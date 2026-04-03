@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE="jdalzatec/nobody-annotator-webapp:latest"
-CONTAINER_NAME="nobody-annotator"
+IMAGE="jdalzatec/nobody-webapp:latest"
+CONTAINER_NAME="nobody"
 PORT=9303
 
 if [ $# -ne 1 ]; then
@@ -28,7 +28,7 @@ if ! docker image inspect "$IMAGE" > /dev/null 2>&1; then
 fi
 
 if docker ps -q -f name="$CONTAINER_NAME" | grep -q .; then
-  echo "Stopping existing annotator container..."
+  echo "Stopping existing nobody container..."
   docker stop "$CONTAINER_NAME" > /dev/null 2>&1
 fi
 
@@ -40,7 +40,7 @@ docker run --rm -d \
   -v "$MD_FILE_ABS:/usr/share/nginx/html/file.md:ro" \
   "$IMAGE" > /dev/null
 
-echo "Annotator is running at http://localhost:$PORT"
+echo "Nobody is running at http://localhost:$PORT"
 echo "Viewing: $MD_FILE"
 echo ""
 echo "To stop: docker stop $CONTAINER_NAME"

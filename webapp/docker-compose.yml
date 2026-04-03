@@ -1,0 +1,8 @@
+services:
+  webapp:
+    image: jdalzatec/nobody-webapp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9303:80"

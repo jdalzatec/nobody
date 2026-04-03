@@ -1,0 +1,44 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  webapp-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: webapp/.nvmrc
+          cache: npm
+          cache-dependency-path: |
+            webapp/package-lock.json
+
+      - name: Install dependencies
+        working-directory: webapp
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: webapp
+        run: npm run typecheck
+
+      - name: ESLint
+        working-directory: webapp
+        run: npm run lint
+
+      - name: Prettier check
+        working-directory: webapp
+        run: npm run format:check
+
+      - name: Stylelint
+        working-directory: webapp
+        run: npm run lint:css
+
+      - name: Tests
+        working-directory: webapp
+        run: npm run test -- --reporter=verbose

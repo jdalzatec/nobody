@@ -1,0 +1,28 @@
+pre-commit:
+  parallel: true
+  commands:
+    webapp-lint:
+      root: "webapp/"
+      glob: "webapp/**/*.{ts,tsx}"
+      run: npm run lint
+
+    webapp-format:
+      root: "webapp/"
+      glob: "webapp/**/*.{ts,tsx,json,css,md}"
+      run: npm run format
+
+    webapp-css:
+      root: "webapp/"
+      glob: "webapp/**/*.css"
+      run: npm run lint:css
+
+pre-push:
+  parallel: true
+  commands:
+    webapp-typecheck:
+      root: "webapp/"
+      run: npm run typecheck
+
+    webapp-test:
+      root: "webapp/"
+      run: npm run test
