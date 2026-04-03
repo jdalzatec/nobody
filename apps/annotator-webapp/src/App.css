@@ -1,198 +1,106 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@import "tailwindcss";
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.7;
+    color: #1a1a2e;
+    background: #f8f9fa;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.7;
-  color: #1a1a2e;
-  background: #f8f9fa;
-  -webkit-font-smoothing: antialiased;
+/* Prose styles for react-markdown output */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  @apply mt-7 mb-2 leading-tight text-slate-900;
 }
 
-.container {
-  max-width: 860px;
-  margin: 2rem auto;
-  padding: 2.5rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+.markdown-body h1 {
+  @apply text-3xl border-b-2 border-gray-200 pb-1.5;
 }
 
-.loading,
-.error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  font-size: 1.1rem;
+.markdown-body h2 {
+  @apply text-2xl border-b border-gray-200 pb-1;
 }
 
-.loading {
-  color: #555;
+.markdown-body h3 {
+  @apply text-xl;
 }
 
-.error {
-  color: #c0392b;
-  font-weight: 600;
+.markdown-body p {
+  @apply mb-4;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-top: 1.8em;
-  margin-bottom: 0.6em;
-  line-height: 1.3;
-  color: #16213e;
+.markdown-body a {
+  @apply text-blue-600 no-underline hover:underline;
 }
 
-h1 {
-  font-size: 2rem;
-  border-bottom: 2px solid #e9ecef;
-  padding-bottom: 0.4em;
+.markdown-body hr {
+  @apply border-t border-gray-300 my-8;
 }
 
-h2 {
-  font-size: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 0.3em;
+.markdown-body blockquote {
+  @apply border-l-4 border-indigo-400 pl-4 py-3 my-4 bg-indigo-50 rounded-r text-gray-700;
 }
 
-h3 {
-  font-size: 1.25rem;
+.markdown-body blockquote p:last-child {
+  @apply mb-0;
 }
 
-p {
-  margin-bottom: 1em;
+.markdown-body table {
+  @apply w-full border-collapse my-4 text-sm;
 }
 
-a {
-  color: #2563eb;
-  text-decoration: none;
+.markdown-body th,
+.markdown-body td {
+  @apply border border-gray-300 px-3 py-2 text-left;
 }
 
-a:hover {
-  text-decoration: underline;
+.markdown-body th {
+  @apply bg-gray-100 font-semibold;
 }
 
-hr {
-  border: none;
-  border-top: 1px solid #dee2e6;
-  margin: 2rem 0;
+.markdown-body tr:nth-child(even) {
+  @apply bg-gray-50;
 }
 
-blockquote {
-  border-left: 4px solid #6366f1;
-  padding: 0.8rem 1.2rem;
-  margin: 1.2rem 0;
-  background: #f0f0ff;
-  border-radius: 0 4px 4px 0;
-  color: #374151;
+.markdown-body code {
+  @apply font-mono text-sm bg-gray-100 px-1.5 py-0.5 rounded;
 }
 
-blockquote p {
-  margin-bottom: 0.4em;
+.markdown-body pre {
+  @apply bg-gray-100 text-slate-900 p-4 rounded-md overflow-x-auto my-4 leading-relaxed border border-gray-300;
 }
 
-blockquote p:last-child {
-  margin-bottom: 0;
+.markdown-body pre code {
+  @apply bg-transparent p-0 text-sm text-inherit;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.2rem 0;
-  font-size: 0.92rem;
+.markdown-body ul,
+.markdown-body ol {
+  @apply my-3 pl-7;
 }
 
-th,
-td {
-  border: 1px solid #dee2e6;
-  padding: 0.55rem 0.75rem;
-  text-align: left;
+.markdown-body li {
+  @apply mb-1;
 }
 
-th {
-  background: #f1f3f5;
-  font-weight: 600;
-}
-
-tr:nth-child(even) {
-  background: #f8f9fa;
-}
-
-code {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 0.88em;
-  background: #f1f3f5;
-  padding: 0.15em 0.4em;
-  border-radius: 3px;
-}
-
-pre {
-  background: #f1f3f5;
-  color: #1a1a2e;
-  padding: 1rem 1.2rem;
-  border-radius: 6px;
-  overflow-x: auto;
-  margin: 1.2rem 0;
-  line-height: 1.5;
-  border: 1px solid #dee2e6;
-}
-
-pre code {
-  background: none;
-  padding: 0;
-  font-size: 0.85rem;
-  color: inherit;
-}
-
-.mermaid-container {
-  display: flex;
-  justify-content: center;
-  margin: 1.5rem 0;
-  overflow-x: auto;
-}
-
-.mermaid-container svg {
-  max-width: 100%;
-  height: auto;
-}
-
-.mermaid-fallback {
-  background: #fef3cd;
-  color: #856404;
-  border: 1px solid #ffc107;
-  border-radius: 6px;
-  padding: 1rem 1.2rem;
-  margin: 1.2rem 0;
-  overflow-x: auto;
-}
-
-.mermaid-fallback code {
-  background: none;
-  color: inherit;
-  font-size: 0.85rem;
-}
-
-ul,
-ol {
-  margin: 0.8em 0;
-  padding-left: 1.8em;
-}
-
-li {
-  margin-bottom: 0.3em;
-}
-
-strong {
-  font-weight: 600;
+/* Annotation highlight — applied imperatively to the DOM */
+.annotation-highlight {
+  @apply bg-yellow-100 rounded-sm cursor-default;
+  border-bottom: 2px solid theme(--color-yellow-300);
 }

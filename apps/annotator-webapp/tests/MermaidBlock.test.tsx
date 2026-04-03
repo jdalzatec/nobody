@@ -12,12 +12,14 @@ import { MermaidBlock } from "../src/components/MermaidBlock";
 
 describe("MermaidBlock", () => {
   it("renders fallback with raw source when mermaid.render fails", async () => {
-    render(<MermaidBlock code="graph TD; A-->B;" />);
-    expect(
-      await screen.findByText("graph TD; A-->B;"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("graph TD; A-->B;").closest("pre")).toHaveClass(
-      "mermaid-fallback",
-    );
+    // Arrange
+    const code = "graph TD; A-->B;";
+
+    // Act
+    render(<MermaidBlock code={code} />);
+
+    // Assert
+    expect(await screen.findByText(code)).toBeInTheDocument();
+    expect(screen.getByText(code).closest("pre")).toBeInTheDocument();
   });
 });

@@ -10,28 +10,49 @@ vi.mock("../src/components/MermaidBlock", () => ({
 
 describe("MarkdownViewer", () => {
   it("renders heading from markdown", () => {
-    render(<MarkdownViewer content="## Section Title" />);
+    // Arrange
+    const content = "## Section Title";
+
+    // Act
+    render(<MarkdownViewer content={content} />);
+
+    // Assert
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
       "Section Title",
     );
   });
 
   it("renders table from markdown", () => {
-    const md = `| Name | Value |\n|------|-------|\n| A | 1 |\n| B | 2 |`;
-    render(<MarkdownViewer content={md} />);
+    // Arrange
+    const content = `| Name | Value |\n|------|-------|\n| A | 1 |\n| B | 2 |`;
+
+    // Act
+    render(<MarkdownViewer content={content} />);
+
+    // Assert
     expect(screen.getByRole("table")).toBeInTheDocument();
     expect(screen.getAllByRole("row")).toHaveLength(3);
   });
 
   it("renders regular code block", () => {
-    const md = "```js\nconsole.log('hi');\n```";
-    render(<MarkdownViewer content={md} />);
+    // Arrange
+    const content = "```js\nconsole.log('hi');\n```";
+
+    // Act
+    render(<MarkdownViewer content={content} />);
+
+    // Assert
     expect(screen.getByText("console.log('hi');")).toBeInTheDocument();
   });
 
   it("delegates mermaid code block to MermaidBlock", () => {
-    const md = "```mermaid\ngraph TD;\nA-->B;\n```";
-    render(<MarkdownViewer content={md} />);
+    // Arrange
+    const content = "```mermaid\ngraph TD;\nA-->B;\n```";
+
+    // Act
+    render(<MarkdownViewer content={content} />);
+
+    // Assert
     expect(screen.getByTestId("mermaid-block")).toBeInTheDocument();
   });
 });
