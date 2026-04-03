@@ -1,5 +1,5 @@
-import { useEffect, useId, useState } from "react";
 import mermaid from "mermaid";
+import { useEffect, useId, useState } from "react";
 
 mermaid.initialize({ startOnLoad: false });
 
@@ -44,10 +44,5 @@ export function MermaidBlock({ code }: MermaidBlockProps) {
     );
   }
 
-  return (
-    <div
-      className="mermaid-diagram"
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
-  );
+  return <div className="mermaid-diagram" dangerouslySetInnerHTML={{ __html: svg }} />;
 }

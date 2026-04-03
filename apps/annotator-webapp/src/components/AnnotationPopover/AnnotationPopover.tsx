@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { Button, Input } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
+import { Button, Input } from "antd";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface AnnotationPopoverProps {
   position: { top: number; left: number };
@@ -8,25 +8,20 @@ interface AnnotationPopoverProps {
   onCancel: () => void;
 }
 
-export function AnnotationPopover({
-  position,
-  onSave,
-  onCancel,
-}: AnnotationPopoverProps) {
+export function AnnotationPopover({ position, onSave, onCancel }: AnnotationPopoverProps) {
   const [comment, setComment] = useState("");
   const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
-      if (
-        popoverRef.current &&
-        !popoverRef.current.contains(e.target as Node)
-      ) {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
         onCancel();
       }
     };
     document.addEventListener("mousedown", handleMouseDown);
-    return () => document.removeEventListener("mousedown", handleMouseDown);
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown);
+    };
   }, [onCancel]);
 
   const handleSave = useCallback(() => {
@@ -58,9 +53,7 @@ export function AnnotationPopover({
       onKeyDown={handleKeyDown}
     >
       <div className="popover-header">
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>
-          User
-        </span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>User</span>
         <Button
           type="text"
           size="small"
@@ -72,7 +65,9 @@ export function AnnotationPopover({
       <Input.TextArea
         autoFocus
         value={comment}
-        onChange={(e) => setComment(e.target.value)}
+        onChange={(e) => {
+          setComment(e.target.value);
+        }}
         placeholder="Add a comment..."
         rows={3}
         style={{ minHeight: 60, resize: "vertical", fontSize: 14 }}
@@ -81,12 +76,7 @@ export function AnnotationPopover({
         <Button size="small" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          type="primary"
-          size="small"
-          onClick={handleSave}
-          disabled={!comment.trim()}
-        >
+        <Button type="primary" size="small" onClick={handleSave} disabled={!comment.trim()}>
           Save
         </Button>
       </div>

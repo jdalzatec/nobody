@@ -1,8 +1,9 @@
-import { useEffect, useState, useCallback } from "react";
 import { Spin, Alert } from "antd";
-import { MarkdownViewer } from "./components/MarkdownViewer";
+import { useEffect, useState, useCallback } from "react";
+
 import { AnnotationPopover } from "./components/AnnotationPopover";
 import { AnnotationSidebar } from "./components/AnnotationSidebar";
+import { MarkdownViewer } from "./components/MarkdownViewer";
 import { useAnnotations } from "./hooks/useAnnotations";
 import "./App.css";
 
@@ -23,7 +24,7 @@ export function App() {
   useEffect(() => {
     fetch("/file.md")
       .then((res) => {
-        if (!res.ok) throw new Error(`Failed to load file.md (${res.status})`);
+        if (!res.ok) throw new Error(`Failed to load file.md (${String(res.status)})`);
         return res.text();
       })
       .then((text) => {
@@ -57,7 +58,7 @@ export function App() {
   if (error) {
     return (
       <div className="centered-container">
-        <Alert type="error" message={error} showIcon />
+        <Alert type="error" title={error} showIcon />
       </div>
     );
   }
@@ -75,11 +76,7 @@ export function App() {
 
   return (
     <div className="app-layout">
-      <div
-        className="markdown-body markdown-column"
-        ref={containerRef}
-        onMouseUp={handleMouseUp}
-      >
+      <div className="markdown-body markdown-column" ref={containerRef} onMouseUp={handleMouseUp}>
         <MarkdownViewer content={content} />
       </div>
       <AnnotationSidebar annotations={annotations} />

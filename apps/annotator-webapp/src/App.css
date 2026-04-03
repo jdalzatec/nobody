@@ -2,13 +2,13 @@
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   line-height: 1.7;
   color: #1a1a2e;
   background: #f8f9fa;
@@ -17,28 +17,28 @@ body {
 
 .centered-container {
   display: flex;
-  min-height: 50vh;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
   gap: 16px;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
 }
 
 .app-layout {
-  max-width: 1180px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 860px) 280px;
   gap: 1.5rem;
+  max-width: 1180px;
   padding: 2.5rem;
+  margin: 0 auto;
 }
 
 .markdown-column {
   position: relative;
-  background: #fff;
   padding: 2.5rem;
+  background: #fff;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
 }
 
 .annotation-sidebar {
@@ -61,17 +61,17 @@ body {
 }
 
 .markdown-body h1 {
+  padding-bottom: 0.375rem;
   font-size: 1.875rem;
   line-height: 2.25rem;
   border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 0.375rem;
 }
 
 .markdown-body h2 {
+  padding-bottom: 0.25rem;
   font-size: 1.5rem;
   line-height: 2rem;
   border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 0.25rem;
 }
 
 .markdown-body h3 {
@@ -93,20 +93,20 @@ body {
 }
 
 .markdown-body hr {
+  margin: 2rem 0;
   border: 0;
   border-top: 1px solid #d1d5db;
-  margin: 2rem 0;
 }
 
 .markdown-body blockquote {
-  border-left: 4px solid #818cf8;
-  padding-left: 1rem;
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+  padding-left: 1rem;
   margin: 1rem 0;
-  background: #eef2ff;
-  border-radius: 0 0.25rem 0.25rem 0;
   color: #374151;
+  background: #eef2ff;
+  border-left: 4px solid #818cf8;
+  border-radius: 0 0.25rem 0.25rem 0;
 }
 
 .markdown-body blockquote p:last-child {
@@ -115,21 +115,21 @@ body {
 
 .markdown-body table {
   width: 100%;
-  border-collapse: collapse;
   margin: 1rem 0;
   font-size: 0.875rem;
+  border-collapse: collapse;
 }
 
 .markdown-body th,
 .markdown-body td {
-  border: 1px solid #d1d5db;
   padding: 0.5rem 0.75rem;
   text-align: left;
+  border: 1px solid #d1d5db;
 }
 
 .markdown-body th {
-  background: #f3f4f6;
   font-weight: 600;
+  background: #f3f4f6;
 }
 
 .markdown-body tr:nth-child(even) {
@@ -137,36 +137,53 @@ body {
 }
 
 .markdown-body code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  padding: 0.125rem 0.375rem;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
   font-size: 0.875rem;
   background: #f3f4f6;
-  padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
 }
 
-.markdown-body pre {
-  background: #f3f4f6;
-  color: #0f172a;
+.mermaid-error {
   padding: 1rem;
-  border-radius: 0.375rem;
+  margin: 1.5rem 0;
   overflow-x: auto;
+  color: #854d0e;
+  background: #fefce8;
+  border: 1px solid #facc15;
+  border-radius: 0.375rem;
+}
+
+.mermaid-error code {
+  font-size: 0.875rem;
+  color: inherit;
+  background: transparent;
+}
+
+.markdown-body pre {
+  padding: 1rem;
   margin: 1rem 0;
+  overflow-x: auto;
   line-height: 1.625;
+  color: #0f172a;
+  background: #f3f4f6;
   border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
 }
 
 .markdown-body pre code {
-  background: transparent;
   padding: 0;
   font-size: 0.875rem;
   color: inherit;
+  background: transparent;
 }
 
 .markdown-body ul,
 .markdown-body ol {
-  margin: 0.75rem 0;
   padding-left: 1.75rem;
+  margin: 0.75rem 0;
 }
 
 .markdown-body li {
@@ -174,32 +191,16 @@ body {
 }
 
 .annotation-highlight {
-  background: #fef9c3;
-  border-radius: 0.125rem;
   cursor: default;
+  background: #fef9c3;
   border-bottom: 2px solid #fcd34d;
-}
-
-.mermaid-error {
-  margin: 1.5rem 0;
-  overflow-x: auto;
-  border-radius: 0.375rem;
-  border: 1px solid #facc15;
-  background: #fefce8;
-  padding: 1rem;
-  color: #854d0e;
-}
-
-.mermaid-error code {
-  background: transparent;
-  font-size: 0.875rem;
-  color: inherit;
+  border-radius: 0.125rem;
 }
 
 .mermaid-diagram {
-  margin: 1.5rem 0;
   display: flex;
   justify-content: center;
+  margin: 1.5rem 0;
   overflow-x: auto;
 }
 
@@ -212,11 +213,13 @@ body {
   position: absolute;
   z-index: 50;
   width: 320px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
   padding: 12px;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 10%),
+    0 4px 6px -4px rgb(0 0 0 / 10%);
 }
 
 .popover-header {
@@ -228,7 +231,7 @@ body {
 
 .popover-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 8px;
+  justify-content: flex-end;
   margin-top: 8px;
 }

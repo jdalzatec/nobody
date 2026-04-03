@@ -1,0 +1,29 @@
+pre-commit:
+  parallel: true
+  commands:
+    annotator-lint:
+      root: "apps/annotator-webapp/"
+      glob: "apps/annotator-webapp/**/*.{ts,tsx}"
+      run: bash -c 'set -- {staged_files}; [ $# -eq 0 ] || npx eslint --max-warnings 0 --fix -- "$@"'
+      stage_fixed: true
+
+    annotator-format:
+      root: "apps/annotator-webapp/"
+      glob: "apps/annotator-webapp/**/*.{ts,tsx,json,css,md}"
+      run: bash -c 'set -- {staged_files}; [ $# -eq 0 ] || npx prettier --write -- "$@"'
+      stage_fixed: true
+
+    annotator-css:
+      root: "apps/annotator-webapp/"
+      glob: "apps/annotator-webapp/**/*.css"
+      run: bash -c 'set -- {staged_files}; [ $# -eq 0 ] || npx stylelint --fix -- "$@"'
+      stage_fixed: true
+
+pre-push:
+  parallel: true
+  commands:
+    annotator-typecheck:
+      run: cd apps/annotator-webapp && npm run typecheck
+
+    annotator-test:
+      run: cd apps/annotator-webapp && npm run test

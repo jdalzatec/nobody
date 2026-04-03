@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+
 import { useAnnotations } from "./useAnnotations";
 
 vi.mock("../../utils/range-utils", () => ({
@@ -44,9 +45,7 @@ describe("useAnnotations", () => {
     });
 
     // Assert
-    expect(result.current.pendingSelection).not.toBeNull();
-    expect(result.current.pendingSelection!.range).toBe(range);
-    expect(result.current.pendingSelection!.rect).toBe(rect);
+    expect(result.current.pendingSelection).toEqual({ range, rect });
   });
 
   it("clears pending selection on cancelAnnotation", () => {

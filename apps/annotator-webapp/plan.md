@@ -30,16 +30,16 @@ Execution plan only — **do not treat as implemented** until the work is merged
 
 ## Current inventory (baseline)
 
-| Area | Location / notes |
-|------|------------------|
-| Vite | `vite.config.ts` — `react()` + `@tailwindcss/vite` |
-| Vitest | `vitest.config.ts` — `setupFiles: ["tests/setup.ts"]`; default `include` discovers `tests/**/*.test.*` |
-| Tailwind entry | `src/App.css` — `@import "tailwindcss"`, base reset, `@apply` under `.markdown-body`, `.annotation-highlight` |
-| shadcn-like UI | `src/components/ui/button.tsx` (CVA + Tailwind), `card.tsx`, `textarea.tsx`; `src/lib/utils.ts` (`cn`) |
-| Feature UI | `App.tsx`, `AnnotationPopover.tsx`, `AnnotationSidebar.tsx`, `MarkdownViewer.tsx`, `MermaidBlock.tsx` — Tailwind `className` |
-| Hooks / utils | `src/hooks/useAnnotations.ts`, `src/utils/range-utils.ts` |
-| Tests | `tests/*.test.{ts,tsx}` importing `../src/...` |
-| Docker | `Dockerfile` runs `npm test && npm run build` — test discovery must stay valid after moves |
+| Area           | Location / notes                                                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Vite           | `vite.config.ts` — `react()` + `@tailwindcss/vite`                                                                           |
+| Vitest         | `vitest.config.ts` — `setupFiles: ["tests/setup.ts"]`; default `include` discovers `tests/**/*.test.*`                       |
+| Tailwind entry | `src/App.css` — `@import "tailwindcss"`, base reset, `@apply` under `.markdown-body`, `.annotation-highlight`                |
+| shadcn-like UI | `src/components/ui/button.tsx` (CVA + Tailwind), `card.tsx`, `textarea.tsx`; `src/lib/utils.ts` (`cn`)                       |
+| Feature UI     | `App.tsx`, `AnnotationPopover.tsx`, `AnnotationSidebar.tsx`, `MarkdownViewer.tsx`, `MermaidBlock.tsx` — Tailwind `className` |
+| Hooks / utils  | `src/hooks/useAnnotations.ts`, `src/utils/range-utils.ts`                                                                    |
+| Tests          | `tests/*.test.{ts,tsx}` importing `../src/...`                                                                               |
+| Docker         | `Dockerfile` runs `npm test && npm run build` — test discovery must stay valid after moves                                   |
 
 ---
 
@@ -54,7 +54,7 @@ Execution plan only — **do not treat as implemented** until the work is merged
 4. **Verify**: `npm run dev` (smoke), `npm run build`, `npm test`, `npm run typecheck`.
 5. **Lockfile**: Regenerate `package-lock.json` and fix any transitive conflicts.
 
-*Sequencing*: Prefer **Phase A as its own commit** so bundler regressions are easy to bisect. Alternatively merge A+B on one branch but keep commits separate.
+_Sequencing_: Prefer **Phase A as its own commit** so bundler regressions are easy to bisect. Alternatively merge A+B on one branch but keep commits separate.
 
 ---
 
@@ -74,15 +74,15 @@ Follow [Ant Design React getting started](https://ant.design/docs/react/getting-
 
 ### B.3 Component mapping
 
-| Current | Ant Design direction |
-|---------|---------------------|
-| `Button` + CVA variants | `Button` (`type`, `danger`, `size`, `ghost`) |
-| `Textarea` | `Input.TextArea` |
-| `Card` + `CardContent` | `Card` with `styles` / `bodyStyle` or inner `Space` |
-| `AnnotationPopover` | Keep **absolute positioning** + `style={{ top, left }}`; inner UI: `Card`, `Input.TextArea`, `Button`, `CloseOutlined` (or `Modal` only if you intentionally change UX — out of scope unless agreed) |
-| `AnnotationSidebar` | `List` + `Card`, or stacked `Card`s with `Typography` for quote + comment |
-| `App` loading / error / grid | `Spin`, `Result` or `Alert`; layout via `Row`/`Col` or `Flex` |
-| `MermaidBlock` | Success: wrapper `div` + minimal CSS; error: `Alert` or `<pre>` with token-aligned colors |
+| Current                      | Ant Design direction                                                                                                                                                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button` + CVA variants      | `Button` (`type`, `danger`, `size`, `ghost`)                                                                                                                                                         |
+| `Textarea`                   | `Input.TextArea`                                                                                                                                                                                     |
+| `Card` + `CardContent`       | `Card` with `styles` / `bodyStyle` or inner `Space`                                                                                                                                                  |
+| `AnnotationPopover`          | Keep **absolute positioning** + `style={{ top, left }}`; inner UI: `Card`, `Input.TextArea`, `Button`, `CloseOutlined` (or `Modal` only if you intentionally change UX — out of scope unless agreed) |
+| `AnnotationSidebar`          | `List` + `Card`, or stacked `Card`s with `Typography` for quote + comment                                                                                                                            |
+| `App` loading / error / grid | `Spin`, `Result` or `Alert`; layout via `Row`/`Col` or `Flex`                                                                                                                                        |
+| `MermaidBlock`               | Success: wrapper `div` + minimal CSS; error: `Alert` or `<pre>` with token-aligned colors                                                                                                            |
 
 ### B.4 Global CSS without Tailwind
 
@@ -118,15 +118,15 @@ Follow [Ant Design React getting started](https://ant.design/docs/react/getting-
 
 ### C.2 Target layout
 
-| From | To |
-|------|-----|
-| `tests/App.test.tsx` | `src/App.test.tsx` |
+| From                               | To                                          |
+| ---------------------------------- | ------------------------------------------- |
+| `tests/App.test.tsx`               | `src/App.test.tsx`                          |
 | `tests/AnnotationPopover.test.tsx` | `src/components/AnnotationPopover.test.tsx` |
 | `tests/AnnotationSidebar.test.tsx` | `src/components/AnnotationSidebar.test.tsx` |
-| `tests/MarkdownViewer.test.tsx` | `src/components/MarkdownViewer.test.tsx` |
-| `tests/MermaidBlock.test.tsx` | `src/components/MermaidBlock.test.tsx` |
-| `tests/useAnnotations.test.tsx` | `src/hooks/useAnnotations.test.tsx` |
-| `tests/range-utils.test.ts` | `src/utils/range-utils.test.ts` |
+| `tests/MarkdownViewer.test.tsx`    | `src/components/MarkdownViewer.test.tsx`    |
+| `tests/MermaidBlock.test.tsx`      | `src/components/MermaidBlock.test.tsx`      |
+| `tests/useAnnotations.test.tsx`    | `src/hooks/useAnnotations.test.tsx`         |
+| `tests/range-utils.test.ts`        | `src/utils/range-utils.test.ts`             |
 
 Optional alternative: `ComponentName/__tests__/ComponentName.test.tsx` — use one convention across the package.
 

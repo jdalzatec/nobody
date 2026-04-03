@@ -1,17 +1,33 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { Components } from "react-markdown";
+
 import { MermaidBlock } from "../MermaidBlock";
+
+import type { ReactNode } from "react";
+import type { Components } from "react-markdown";
 
 interface MarkdownViewerProps {
   content: string;
+}
+
+function codeChildrenToPlainText(children: ReactNode): string {
+  if (typeof children === "string") {
+    return children.replace(/\n$/, "");
+  }
+  if (Array.isArray(children)) {
+    return children
+      .filter((part): part is string => typeof part === "string")
+      .join("")
+      .replace(/\n$/, "");
+  }
+  return "";
 }
 
 const components: Components = {
   code({ className, children, ...rest }) {
     const match = /language-(\w+)/.exec(className ?? "");
     const lang = match?.[1];
-    const text = String(children).replace(/\n$/, "");
+    const text = codeChildrenToPlainText(children);
 
     if (lang === "mermaid") {
       return <MermaidBlock code={text} />;

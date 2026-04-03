@@ -1,4 +1,5 @@
 import { Card, Typography } from "antd";
+
 import type { Annotation } from "../../types";
 
 const { Text } = Typography;
@@ -34,9 +35,7 @@ export function AnnotationSidebar({ annotations }: AnnotationSidebarProps) {
           >
             {annotation.text}
           </blockquote>
-          <Text style={{ lineHeight: 1.4, color: "#1f2937" }}>
-            {annotation.comment}
-          </Text>
+          <Text style={{ lineHeight: 1.4, color: "#1f2937" }}>{annotation.comment}</Text>
         </Card>
       ))}
     </aside>

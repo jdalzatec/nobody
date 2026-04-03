@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
+
 import { AnnotationSidebar } from "./AnnotationSidebar";
+
 import type { Annotation } from "../../types";
 
 const makeAnnotation = (overrides: Partial<Annotation> = {}): Annotation => ({

@@ -1,11 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+
 import { MarkdownViewer } from "./MarkdownViewer";
 
 vi.mock("../MermaidBlock", () => ({
-  MermaidBlock: ({ code }: { code: string }) => (
-    <div data-testid="mermaid-block">{code}</div>
-  ),
+  MermaidBlock: ({ code }: { code: string }) => <div data-testid="mermaid-block">{code}</div>,
 }));
 
 describe("MarkdownViewer", () => {
@@ -17,9 +16,7 @@ describe("MarkdownViewer", () => {
     render(<MarkdownViewer content={content} />);
 
     // Assert
-    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
-      "Section Title",
-    );
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Section Title");
   });
 
   it("renders table from markdown", () => {

@@ -15,16 +15,13 @@ function getNodePath(node: Node, root: Node): number[] {
 function resolveNodePath(path: number[], root: Node): Node | null {
   let current: Node = root;
   for (const index of path) {
-    if (!current.childNodes[index]) return null;
+    if (index < 0 || index >= current.childNodes.length) return null;
     current = current.childNodes[index];
   }
   return current;
 }
 
-export function serializeRange(
-  range: Range,
-  container: HTMLElement,
-): SerializedRange {
+export function serializeRange(range: Range, container: HTMLElement): SerializedRange {
   return {
     startContainerPath: getNodePath(range.startContainer, container),
     startOffset: range.startOffset,
@@ -54,13 +51,8 @@ export function highlightRange(
   }
 }
 
-function wrapTextNode(
-  node: Text,
-  start: number,
-  end: number,
-  annotationId: string,
-): void {
-  const text = node.textContent ?? "";
+function wrapTextNode(node: Text, start: number, end: number, annotationId: string): void {
+  const text = node.data;
   const mark = document.createElement("mark");
   mark.className = "annotation-highlight";
   mark.dataset.annotationId = annotationId;
@@ -95,10 +87,7 @@ function getTextNodesInRange(
     if (!range.intersectsNode(node)) continue;
 
     const start = node === range.startContainer ? range.startOffset : 0;
-    const end =
-      node === range.endContainer
-        ? range.endOffset
-        : (node.textContent?.length ?? 0);
+    const end = node === range.endContainer ? range.endOffset : node.data.length;
 
     if (start !== end) {
       results.push({ node, start, end });

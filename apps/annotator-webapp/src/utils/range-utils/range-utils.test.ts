@@ -1,4 +1,7 @@
+import assert from "node:assert/strict";
+
 import { describe, it, expect } from "vitest";
+
 import { serializeRange, highlightRange } from "./range-utils";
 
 describe("serializeRange", () => {
@@ -6,7 +9,11 @@ describe("serializeRange", () => {
     // Arrange
     const container = document.createElement("div");
     container.innerHTML = "<p>Hello world</p>";
-    const textNode = container.querySelector("p")!.firstChild!;
+    const p = container.querySelector("p");
+    expect(p).not.toBeNull();
+    assert(p);
+    const textNode = p.firstChild;
+    assert(textNode instanceof Text);
     const range = document.createRange();
     range.setStart(textNode, 0);
     range.setEnd(textNode, 5);
@@ -25,8 +32,10 @@ describe("serializeRange", () => {
     // Arrange
     const container = document.createElement("div");
     container.innerHTML = "<p>Hello</p><p>World</p>";
-    const firstText = container.children[0].firstChild!;
-    const secondText = container.children[1].firstChild!;
+    const firstText = container.children[0].firstChild;
+    const secondText = container.children[1].firstChild;
+    assert(firstText instanceof Text);
+    assert(secondText instanceof Text);
     const range = document.createRange();
     range.setStart(firstText, 2);
     range.setEnd(secondText, 3);
@@ -58,11 +67,11 @@ describe("highlightRange", () => {
     highlightRange(serialized, container, "ann-1");
 
     // Assert
-    const mark = container.querySelector("mark");
-    expect(mark).not.toBeNull();
-    expect(mark!.textContent).toBe("Hello");
-    expect(mark!.className).toBe("annotation-highlight");
-    expect(mark!.dataset.annotationId).toBe("ann-1");
+    const marks = container.querySelectorAll("mark");
+    expect(marks.length).toBe(1);
+    expect(marks[0].textContent).toBe("Hello");
+    expect(marks[0].className).toBe("annotation-highlight");
+    expect(marks[0].dataset.annotationId).toBe("ann-1");
   });
 
   it("wraps a partial text node, preserving surrounding text", () => {
@@ -80,8 +89,9 @@ describe("highlightRange", () => {
     highlightRange(serialized, container, "ann-2");
 
     // Assert
-    const p = container.querySelector("p")!;
-    expect(p.innerHTML).toBe(
+    const paras = container.querySelectorAll("p");
+    expect(paras.length).toBe(1);
+    expect(paras[0].innerHTML).toBe(
       'Hello <mark class="annotation-highlight" data-annotation-id="ann-2">world</mark>',
     );
   });
