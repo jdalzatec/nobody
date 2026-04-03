@@ -1,6 +1,6 @@
 services:
-  annotator-webapp:
-    image: jdalzatec/nobody-annotator-webapp:latest
+  webapp:
+    image: jdalzatec/nobody-webapp:latest
     build:
       context: .
       dockerfile: Dockerfile

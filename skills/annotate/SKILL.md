@@ -1,6 +1,6 @@
 ---
 name: annotate
-description: Launch the annotator webapp to view a markdown file in the browser. Use when the user wants to view, read, or annotate a markdown report.
+description: Launch the nobody webapp to view a markdown file in the browser. Use when the user wants to view, read, or annotate a markdown report.
 ---
 
 ## What it does
@@ -16,4 +16,4 @@ The user provides a **markdown file path**, e.g. `/annotate research_20260402_00
 1. Run `skills/annotate/scripts/run-annotator.sh <file>` passing the markdown file path
 2. The script starts the container in the background on port 9303
 3. Tell the user the URL: **http://localhost:9303**
-4. If the user wants to stop it: `docker stop nobody-annotator`
+4. If the user wants to stop it: `docker stop nobody`

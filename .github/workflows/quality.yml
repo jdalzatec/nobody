@@ -7,42 +7,38 @@ on:
     branches: [main]
 
 jobs:
-  quality:
+  webapp-quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
+          node-version-file: webapp/.nvmrc
           cache: npm
           cache-dependency-path: |
-            package-lock.json
-            apps/annotator-webapp/package-lock.json
+            webapp/package-lock.json
 
-      - name: Install root dependencies
-        run: npm ci
-
-      - name: Install annotator-webapp dependencies
-        working-directory: apps/annotator-webapp
+      - name: Install dependencies
+        working-directory: webapp
         run: npm ci
 
       - name: Typecheck
-        working-directory: apps/annotator-webapp
+        working-directory: webapp
         run: npm run typecheck
 
       - name: ESLint
-        working-directory: apps/annotator-webapp
+        working-directory: webapp
         run: npm run lint
 
       - name: Prettier check
-        working-directory: apps/annotator-webapp
+        working-directory: webapp
         run: npm run format:check
 
       - name: Stylelint
-        working-directory: apps/annotator-webapp
+        working-directory: webapp
         run: npm run lint:css
 
       - name: Tests
-        working-directory: apps/annotator-webapp
+        working-directory: webapp
         run: npm run test -- --reporter=verbose
