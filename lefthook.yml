@@ -4,26 +4,25 @@ pre-commit:
     webapp-lint:
       root: "webapp/"
       glob: "webapp/**/*.{ts,tsx}"
-      run: bash -c 'set -- {staged_files}; [ $# -eq 0 ] || npx eslint --max-warnings 0 --fix -- "$@"'
-      stage_fixed: true
+      run: npm run lint
 
     webapp-format:
       root: "webapp/"
       glob: "webapp/**/*.{ts,tsx,json,css,md}"
-      run: bash -c 'set -- {staged_files}; [ $# -eq 0 ] || npx prettier --write -- "$@"'
-      stage_fixed: true
+      run: npm run format
 
     webapp-css:
       root: "webapp/"
       glob: "webapp/**/*.css"
-      run: bash -c 'set -- {staged_files}; [ $# -eq 0 ] || npx stylelint --fix -- "$@"'
-      stage_fixed: true
+      run: npm run lint:css
 
 pre-push:
   parallel: true
   commands:
     webapp-typecheck:
-      run: cd webapp && npm run typecheck
+      root: "webapp/"
+      run: npm run typecheck
 
     webapp-test:
-      run: cd webapp && npm run test
+      root: "webapp/"
+      run: npm run test
