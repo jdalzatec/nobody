@@ -27,5 +27,6 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           platforms: linux/amd64,linux/arm64
+          context: webapp
           push: true
           tags: ${{ env.LATEST_TAG }}
