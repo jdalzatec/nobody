@@ -1,1 +1,1 @@
-export { serializeRange, highlightRange } from "./range-utils";
+export { serializeRange, highlightRange, removePendingHighlight } from "./range-utils";

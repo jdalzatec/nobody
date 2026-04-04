@@ -1,6 +1,8 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 
+import { highlightRange, removePendingHighlight } from "../../utils/range-utils";
+
 import { useAnnotations } from "./useAnnotations";
 
 vi.mock("../../utils/range-utils", () => ({
@@ -11,6 +13,7 @@ vi.mock("../../utils/range-utils", () => ({
     endOffset: 5,
   })),
   highlightRange: vi.fn(),
+  removePendingHighlight: vi.fn(),
 }));
 
 function createMockRange(text: string): Range {
@@ -36,6 +39,11 @@ describe("useAnnotations", () => {
   it("sets pending selection when handleTextSelected is called", () => {
     // Arrange
     const { result } = renderHook(() => useAnnotations());
+    const container = document.createElement("div");
+    Object.defineProperty(result.current.containerRef, "current", {
+      value: container,
+      writable: true,
+    });
     const range = createMockRange("hello");
     const rect = createMockRect();
 
@@ -45,12 +53,63 @@ describe("useAnnotations", () => {
     });
 
     // Assert
-    expect(result.current.pendingSelection).toEqual({ range, rect });
+    expect(result.current.pendingSelection).not.toBeNull();
+    expect(result.current.pendingSelection?.range).toBe(range);
+  });
+
+  it("applies pending highlight when text is selected", () => {
+    // Arrange
+    const { result } = renderHook(() => useAnnotations());
+    const container = document.createElement("div");
+    Object.defineProperty(result.current.containerRef, "current", {
+      value: container,
+      writable: true,
+    });
+
+    // Act
+    act(() => {
+      result.current.handleTextSelected(createMockRange("hello"), createMockRect());
+    });
+
+    // Assert
+    expect(vi.mocked(highlightRange)).toHaveBeenCalledWith(
+      expect.objectContaining({ startContainerPath: [0, 0] }),
+      container,
+      "pending",
+      "annotation-highlight-pending",
+    );
+  });
+
+  it("cleans up previous pending highlight on re-selection", () => {
+    // Arrange
+    const { result } = renderHook(() => useAnnotations());
+    const container = document.createElement("div");
+    Object.defineProperty(result.current.containerRef, "current", {
+      value: container,
+      writable: true,
+    });
+    act(() => {
+      result.current.handleTextSelected(createMockRange("first"), createMockRect());
+    });
+    vi.mocked(removePendingHighlight).mockClear();
+
+    // Act
+    act(() => {
+      result.current.handleTextSelected(createMockRange("second"), createMockRect());
+    });
+
+    // Assert
+    expect(vi.mocked(removePendingHighlight)).toHaveBeenCalledWith(container);
   });
 
   it("clears pending selection on cancelAnnotation", () => {
     // Arrange
     const { result } = renderHook(() => useAnnotations());
+    const container = document.createElement("div");
+    Object.defineProperty(result.current.containerRef, "current", {
+      value: container,
+      writable: true,
+    });
     act(() => {
       result.current.handleTextSelected(createMockRange("hello"), createMockRect());
     });
@@ -63,6 +122,28 @@ describe("useAnnotations", () => {
 
     // Assert
     expect(result.current.pendingSelection).toBeNull();
+  });
+
+  it("removes pending highlight on cancel", () => {
+    // Arrange
+    const { result } = renderHook(() => useAnnotations());
+    const container = document.createElement("div");
+    Object.defineProperty(result.current.containerRef, "current", {
+      value: container,
+      writable: true,
+    });
+    act(() => {
+      result.current.handleTextSelected(createMockRange("hello"), createMockRect());
+    });
+    vi.mocked(removePendingHighlight).mockClear();
+
+    // Act
+    act(() => {
+      result.current.cancelAnnotation();
+    });
+
+    // Assert
+    expect(vi.mocked(removePendingHighlight)).toHaveBeenCalledWith(container);
   });
 
   it("adds an annotation and clears pending selection on saveAnnotation", () => {
@@ -87,6 +168,34 @@ describe("useAnnotations", () => {
     expect(result.current.annotations[0].comment).toBe("my comment");
     expect(result.current.annotations[0].text).toBe("hello");
     expect(result.current.pendingSelection).toBeNull();
+  });
+
+  it("removes pending highlight and applies permanent highlight on save", () => {
+    // Arrange
+    const { result } = renderHook(() => useAnnotations());
+    const container = document.createElement("div");
+    Object.defineProperty(result.current.containerRef, "current", {
+      value: container,
+      writable: true,
+    });
+    act(() => {
+      result.current.handleTextSelected(createMockRange("hello"), createMockRect());
+    });
+    vi.mocked(removePendingHighlight).mockClear();
+    vi.mocked(highlightRange).mockClear();
+
+    // Act
+    act(() => {
+      result.current.saveAnnotation("my comment");
+    });
+
+    // Assert
+    expect(vi.mocked(removePendingHighlight)).toHaveBeenCalledWith(container);
+    expect(vi.mocked(highlightRange)).toHaveBeenCalledWith(
+      expect.objectContaining({ startContainerPath: [0, 0] }),
+      container,
+      expect.any(String),
+    );
   });
 
   it("does nothing on saveAnnotation when there is no pending selection", () => {
