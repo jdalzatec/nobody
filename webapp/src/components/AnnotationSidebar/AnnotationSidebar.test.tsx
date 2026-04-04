@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { createRef } from "react";
+import { describe, it, expect, vi } from "vitest";
 
 import { AnnotationSidebar } from "./AnnotationSidebar";
 
@@ -18,13 +19,25 @@ const makeAnnotation = (overrides: Partial<Annotation> = {}): Annotation => ({
   ...overrides,
 });
 
+function defaultProps(overrides: Partial<Parameters<typeof AnnotationSidebar>[0]> = {}) {
+  return {
+    annotations: [] as Annotation[],
+    sidebarRef: createRef<HTMLDivElement>(),
+    positions: new Map<string, number>(),
+    containerHeight: 0,
+    registerCard: vi.fn(),
+    unregisterCard: vi.fn(),
+    ...overrides,
+  };
+}
+
 describe("AnnotationSidebar", () => {
-  it("renders nothing when there are no annotations", () => {
-    // Arrange & Act
-    const { container } = render(<AnnotationSidebar annotations={[]} />);
+  it("renders the container element even when annotations is empty", () => {
+    // Act
+    const { container } = render(<AnnotationSidebar {...defaultProps()} />);
 
     // Assert
-    expect(container.innerHTML).toBe("");
+    expect(container.querySelector(".annotation-sidebar")).toBeInTheDocument();
   });
 
   it("renders a card for each annotation", () => {
@@ -36,10 +49,12 @@ describe("AnnotationSidebar", () => {
     ];
 
     // Act
-    render(<AnnotationSidebar annotations={annotations} />);
+    render(<AnnotationSidebar {...defaultProps({ annotations })} />);
 
     // Assert
-    expect(screen.getAllByText("User")).toHaveLength(3);
+    expect(screen.getByText("First")).toBeInTheDocument();
+    expect(screen.getByText("Second")).toBeInTheDocument();
+    expect(screen.getByText("Third")).toBeInTheDocument();
   });
 
   it("displays the selected text as a quote", () => {
@@ -47,7 +62,7 @@ describe("AnnotationSidebar", () => {
     const annotations = [makeAnnotation({ text: "highlighted portion" })];
 
     // Act
-    render(<AnnotationSidebar annotations={annotations} />);
+    render(<AnnotationSidebar {...defaultProps({ annotations })} />);
 
     // Assert
     expect(screen.getByText("highlighted portion")).toBeInTheDocument();
@@ -58,20 +73,52 @@ describe("AnnotationSidebar", () => {
     const annotations = [makeAnnotation({ comment: "This is important" })];
 
     // Act
-    render(<AnnotationSidebar annotations={annotations} />);
+    render(<AnnotationSidebar {...defaultProps({ annotations })} />);
 
     // Assert
     expect(screen.getByText("This is important")).toBeInTheDocument();
   });
 
-  it("shows the User label on each card", () => {
+  it("applies the correct top from positions map", () => {
     // Arrange
-    const annotations = [makeAnnotation()];
+    const annotations = [
+      makeAnnotation({ id: "a" }),
+      makeAnnotation({ id: "b", comment: "Second" }),
+    ];
+    const positions = new Map([
+      ["a", 100],
+      ["b", 250],
+    ]);
 
     // Act
-    render(<AnnotationSidebar annotations={annotations} />);
+    const { container } = render(
+      <AnnotationSidebar {...defaultProps({ annotations, positions })} />,
+    );
 
     // Assert
-    expect(screen.getByText("User")).toBeInTheDocument();
+    const wrappers = container.querySelectorAll<HTMLElement>(".annotation-sidebar > div");
+    expect(wrappers[0].style.top).toBe("100px");
+    expect(wrappers[1].style.top).toBe("250px");
+  });
+
+  it("calls registerCard on mount and unregisterCard on unmount", () => {
+    // Arrange
+    const registerCard = vi.fn();
+    const unregisterCard = vi.fn();
+    const annotations = [makeAnnotation({ id: "a" })];
+
+    // Act
+    const { unmount } = render(
+      <AnnotationSidebar {...defaultProps({ annotations, registerCard, unregisterCard })} />,
+    );
+
+    // Assert — registerCard called on mount
+    expect(registerCard).toHaveBeenCalledWith("a", expect.any(HTMLElement));
+
+    // Act — unmount
+    unmount();
+
+    // Assert — unregisterCard called on unmount
+    expect(unregisterCard).toHaveBeenCalledWith("a");
   });
 });

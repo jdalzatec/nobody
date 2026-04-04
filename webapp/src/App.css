@@ -25,12 +25,22 @@ body {
 }
 
 .app-layout {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 860px) 280px;
   gap: 1.5rem;
   max-width: 1180px;
   padding: 2.5rem;
   margin: 0 auto;
+}
+
+.annotation-connectors {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .markdown-column {
@@ -42,10 +52,8 @@ body {
 }
 
 .annotation-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding-top: 2.5rem;
+  position: relative;
+  align-self: start;
 }
 
 .markdown-body h1,

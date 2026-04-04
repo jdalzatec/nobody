@@ -1,9 +1,11 @@
 import { Spin, Alert } from "antd";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
+import { AnnotationConnectors } from "./components/AnnotationConnectors";
 import { AnnotationPopover } from "./components/AnnotationPopover";
 import { AnnotationSidebar } from "./components/AnnotationSidebar";
 import { MarkdownViewer } from "./components/MarkdownViewer";
+import { useAnnotationLayout } from "./hooks/useAnnotationLayout";
 import { useAnnotations } from "./hooks/useAnnotations";
 import "./App.css";
 
@@ -21,6 +23,17 @@ export function App() {
     cancelAnnotation,
   } = useAnnotations();
 
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const layoutRef = useRef<HTMLDivElement>(null);
+
+  const { positions, containerHeight, connectors, registerCard, unregisterCard } =
+    useAnnotationLayout({
+      annotations,
+      containerRef,
+      sidebarRef,
+      layoutRef,
+    });
+
   useEffect(() => {
     fetch("/file.md")
       .then((res) => {
@@ -37,6 +50,10 @@ export function App() {
       });
   }, []);
 
+  const [popoverPosition, setPopoverPosition] = useState<{ top: number; left: number } | null>(
+    null,
+  );
+
   const handleMouseUp = useCallback(() => {
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed || !containerRef.current) return;
@@ -44,7 +61,15 @@ export function App() {
     if (!containerRef.current.contains(range.commonAncestorContainer)) return;
     const rect = range.getBoundingClientRect();
     handleTextSelected(range, rect);
-  }, [containerRef, handleTextSelected]);
+
+    const layoutRect = layoutRef.current?.getBoundingClientRect();
+    if (layoutRect) {
+      setPopoverPosition({
+        top: rect.bottom - layoutRect.top + 8,
+        left: rect.left - layoutRect.left,
+      });
+    }
+  }, [containerRef, handleTextSelected, layoutRef]);
 
   if (loading) {
     return (
@@ -67,24 +92,31 @@ export function App() {
     return null;
   }
 
-  const popoverPosition = pendingSelection
-    ? {
-        top: pendingSelection.rect.bottom + window.scrollY + 8,
-        left: pendingSelection.rect.left + window.scrollX,
-      }
-    : null;
-
   return (
-    <div className="app-layout">
+    <div className="app-layout" ref={layoutRef}>
       <div className="markdown-body markdown-column" ref={containerRef} onMouseUp={handleMouseUp}>
         <MarkdownViewer content={content} />
       </div>
-      <AnnotationSidebar annotations={annotations} />
+      <AnnotationSidebar
+        annotations={annotations}
+        sidebarRef={sidebarRef}
+        positions={positions}
+        containerHeight={containerHeight}
+        registerCard={registerCard}
+        unregisterCard={unregisterCard}
+      />
+      <AnnotationConnectors connectors={connectors} />
       {pendingSelection && popoverPosition && (
         <AnnotationPopover
           position={popoverPosition}
-          onSave={saveAnnotation}
-          onCancel={cancelAnnotation}
+          onSave={(comment: string) => {
+            saveAnnotation(comment);
+            setPopoverPosition(null);
+          }}
+          onCancel={() => {
+            cancelAnnotation();
+            setPopoverPosition(null);
+          }}
         />
       )}
     </div>

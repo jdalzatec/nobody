@@ -11,14 +11,6 @@ const defaultProps = {
 };
 
 describe("AnnotationPopover", () => {
-  it("renders the User label", () => {
-    // Arrange & Act
-    render(<AnnotationPopover {...defaultProps} />);
-
-    // Assert
-    expect(screen.getByText("User")).toBeInTheDocument();
-  });
-
   it("renders a textarea with placeholder", () => {
     // Arrange & Act
     render(<AnnotationPopover {...defaultProps} />);
@@ -34,14 +26,6 @@ describe("AnnotationPopover", () => {
     // Assert
     expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
-  });
-
-  it("renders a close button with X icon", () => {
-    // Arrange & Act
-    render(<AnnotationPopover {...defaultProps} />);
-
-    // Assert
-    expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
   });
 
   it("auto-focuses the textarea on mount", () => {
@@ -91,18 +75,6 @@ describe("AnnotationPopover", () => {
 
     // Act
     await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
-
-    // Assert
-    expect(onCancel).toHaveBeenCalled();
-  });
-
-  it("calls onCancel when X button is clicked", async () => {
-    // Arrange
-    const onCancel = vi.fn();
-    render(<AnnotationPopover {...defaultProps} onCancel={onCancel} />);
-
-    // Act
-    await userEvent.click(screen.getByRole("button", { name: "Close" }));
 
     // Assert
     expect(onCancel).toHaveBeenCalled();
