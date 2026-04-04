@@ -1,6 +1,5 @@
-import { CloseOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface AnnotationPopoverProps {
   position: { top: number; left: number };
@@ -52,16 +51,6 @@ export function AnnotationPopover({ position, onSave, onCancel }: AnnotationPopo
       style={{ top: position.top, left: position.left }}
       onKeyDown={handleKeyDown}
     >
-      <div className="popover-header">
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>User</span>
-        <Button
-          type="text"
-          size="small"
-          icon={<CloseOutlined />}
-          onClick={onCancel}
-          aria-label="Close"
-        />
-      </div>
       <Input.TextArea
         autoFocus
         value={comment}

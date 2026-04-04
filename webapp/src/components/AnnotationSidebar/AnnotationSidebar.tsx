@@ -1,4 +1,4 @@
-import { Card, Typography } from "antd";
+import { Card, Typography, theme } from "antd";
 import { useMemo } from "react";
 
 import type { Annotation } from "../../types";
@@ -37,6 +37,8 @@ export function AnnotationSidebar({
     return map;
   }, [annotations, registerCard, unregisterCard]);
 
+  const { token } = theme.useToken();
+
   return (
     <aside
       className="annotation-sidebar"
@@ -56,24 +58,21 @@ export function AnnotationSidebar({
           <Card
             size="small"
             styles={{ body: { padding: 12 } }}
-            style={{ borderLeft: "3px solid #6366f1", fontSize: 14 }}
+            style={{ borderLeft: `3px solid ${token.colorPrimary}`, fontSize: 14 }}
           >
-            <Text strong style={{ fontSize: 12, color: "#6b7280" }}>
-              User
-            </Text>
             <blockquote
               style={{
-                borderLeft: "2px solid #d1d5db",
+                borderLeft: `2px solid ${token.colorBorder}`,
                 paddingLeft: 8,
                 margin: "4px 0 6px",
                 fontSize: 12,
                 fontStyle: "italic",
-                color: "#6b7280",
+                color: token.colorTextSecondary,
               }}
             >
               {annotation.text}
             </blockquote>
-            <Text style={{ lineHeight: 1.4, color: "#1f2937" }}>{annotation.comment}</Text>
+            <Text style={{ lineHeight: 1.4, color: token.colorText }}>{annotation.comment}</Text>
           </Card>
         </div>
       ))}

@@ -52,7 +52,9 @@ describe("AnnotationSidebar", () => {
     render(<AnnotationSidebar {...defaultProps({ annotations })} />);
 
     // Assert
-    expect(screen.getAllByText("User")).toHaveLength(3);
+    expect(screen.getByText("First")).toBeInTheDocument();
+    expect(screen.getByText("Second")).toBeInTheDocument();
+    expect(screen.getByText("Third")).toBeInTheDocument();
   });
 
   it("displays the selected text as a quote", () => {
@@ -75,17 +77,6 @@ describe("AnnotationSidebar", () => {
 
     // Assert
     expect(screen.getByText("This is important")).toBeInTheDocument();
-  });
-
-  it("shows the User label on each card", () => {
-    // Arrange
-    const annotations = [makeAnnotation()];
-
-    // Act
-    render(<AnnotationSidebar {...defaultProps({ annotations })} />);
-
-    // Assert
-    expect(screen.getByText("User")).toBeInTheDocument();
   });
 
   it("applies the correct top from positions map", () => {

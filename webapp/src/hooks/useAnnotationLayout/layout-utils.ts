@@ -2,6 +2,11 @@ import type { Annotation } from "../../types";
 
 const DEFAULT_GAP = 8;
 
+/**
+ * Measures the vertical midpoint of each annotation's highlight mark relative
+ * to the sidebar's top edge. These "ideal" Y positions are used as targets
+ * when placing sidebar cards so each card aligns with its corresponding highlight.
+ */
 export function measureHighlightTops(
   annotations: Annotation[],
   container: HTMLElement | null,
@@ -23,6 +28,12 @@ export function measureHighlightTops(
   return tops;
 }
 
+/**
+ * Resolves vertical overlaps between sidebar cards. Cards are placed as close
+ * as possible to their ideal highlight-aligned position (centered on the
+ * highlight midpoint), but are pushed downward when they would overlap a
+ * previously placed card, ensuring a minimum gap between them.
+ */
 export function resolveOverlaps(
   highlightTops: Map<string, number>,
   cardHeights: Map<string, number>,

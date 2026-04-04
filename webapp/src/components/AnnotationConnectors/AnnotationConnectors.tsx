@@ -1,3 +1,5 @@
+import { theme } from "antd";
+
 import type { Connector } from "../../hooks/useAnnotationLayout";
 
 interface AnnotationConnectorsProps {
@@ -5,12 +7,21 @@ interface AnnotationConnectorsProps {
 }
 
 export function AnnotationConnectors({ connectors }: AnnotationConnectorsProps) {
+  const { token } = theme.useToken();
+
   if (connectors.length === 0) return null;
 
   return (
     <svg className="annotation-connectors">
       {connectors.map((c) => (
-        <path key={c.id} d={c.path} fill="none" stroke="#6366f1" strokeWidth={1.5} opacity={0.4} />
+        <path
+          key={c.id}
+          d={c.path}
+          fill="none"
+          stroke={token.colorPrimary}
+          strokeWidth={1.5}
+          opacity={0.4}
+        />
       ))}
     </svg>
   );
