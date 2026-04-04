@@ -10,14 +10,7 @@ export function AnnotationConnectors({ connectors }: AnnotationConnectorsProps) 
   return (
     <svg className="annotation-connectors">
       {connectors.map((c) => (
-        <path
-          key={c.id}
-          d={c.path}
-          fill="none"
-          stroke="#6366f1"
-          strokeWidth={1.5}
-          opacity={0.4}
-        />
+        <path key={c.id} d={c.path} fill="none" stroke="#6366f1" strokeWidth={1.5} opacity={0.4} />
       ))}
     </svg>
   );

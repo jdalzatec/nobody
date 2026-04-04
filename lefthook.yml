@@ -9,7 +9,7 @@ pre-commit:
     webapp-format:
       root: "webapp/"
       glob: "webapp/**/*.{ts,tsx,json,css,md}"
-      run: npm run format
+      run: npm run format:check
 
     webapp-css:
       root: "webapp/"

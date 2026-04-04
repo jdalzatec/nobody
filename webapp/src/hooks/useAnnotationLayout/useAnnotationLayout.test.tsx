@@ -55,16 +55,20 @@ function makeRefs() {
 
 describe("useAnnotationLayout", () => {
   it("positions is empty on initial render when no annotations", () => {
+    // Arrange
     const { containerRef, sidebarRef, layoutRef } = makeRefs();
 
+    // Act
     const { result } = renderHook(() =>
       useAnnotationLayout({ annotations: [], containerRef, sidebarRef, layoutRef }),
     );
 
+    // Assert
     expect(result.current.positions.size).toBe(0);
   });
 
   it("registerCard stores element and positions update after resize", () => {
+    // Arrange
     const { container, sidebar, containerRef, sidebarRef, layoutRef } = makeRefs();
     const annotations = [makeAnnotation("a")];
 
@@ -84,7 +88,7 @@ describe("useAnnotationLayout", () => {
       result.current.registerCard("a", cardEl);
     });
 
-    // Simulate ResizeObserver firing with a height
+    // Act — simulate ResizeObserver firing with a height
     const lastCallback = resizeCallbacks[resizeCallbacks.length - 1];
     act(() => {
       lastCallback(
@@ -93,11 +97,12 @@ describe("useAnnotationLayout", () => {
       );
     });
 
-    // midY = 200+10 - 100 = 110, desired = 110 - 50/2 = 85
+    // Assert — midY = 200+10 - 100 = 110, desired = 110 - 50/2 = 85
     expect(result.current.positions.get("a")).toBe(85);
   });
 
   it("unregisterCard removes position when annotations change", () => {
+    // Arrange
     const { container, sidebar, containerRef, sidebarRef, layoutRef } = makeRefs();
     const annotations1 = [makeAnnotation("a")];
 
@@ -129,16 +134,18 @@ describe("useAnnotationLayout", () => {
 
     expect(result.current.positions.get("a")).toBe(85);
 
-    // Unregister and remove annotation (mirrors real usage)
+    // Act — unregister and remove annotation (mirrors real usage)
     act(() => {
       result.current.unregisterCard("a");
     });
     rerender({ annotations: [] });
 
+    // Assert
     expect(result.current.positions.has("a")).toBe(false);
   });
 
   it("updates positions when annotations change", () => {
+    // Arrange
     const { container, sidebar, containerRef, sidebarRef, layoutRef } = makeRefs();
     const annotations1 = [makeAnnotation("a")];
 
@@ -155,7 +162,6 @@ describe("useAnnotationLayout", () => {
       { initialProps: { annotations: annotations1 } },
     );
 
-    // Register card and trigger resize
     const cardEl = document.createElement("div");
     act(() => {
       result.current.registerCard("a", cardEl);
@@ -168,10 +174,10 @@ describe("useAnnotationLayout", () => {
       );
     });
 
-    // midY = 200+10 - 100 = 110, desired = 110 - 50/2 = 85
+    // Assert — midY = 200+10 - 100 = 110, desired = 110 - 50/2 = 85
     expect(result.current.positions.get("a")).toBe(85);
 
-    // Add a second annotation
+    // Arrange — add a second annotation
     const markB = document.createElement("mark");
     markB.setAttribute("data-annotation-id", "b");
     container.appendChild(markB);
@@ -184,9 +190,9 @@ describe("useAnnotationLayout", () => {
       result.current.registerCard("b", cardElB);
     });
 
+    // Act — rerender with new annotations and fire resize for card b
     rerender({ annotations: annotations2 });
 
-    // Fire resize for card b
     const latestCallback = resizeCallbacks[resizeCallbacks.length - 1];
     act(() => {
       latestCallback(
@@ -195,33 +201,41 @@ describe("useAnnotationLayout", () => {
       );
     });
 
+    // Assert
     expect(result.current.positions.has("a")).toBe(true);
     expect(result.current.positions.has("b")).toBe(true);
   });
 
   it("disconnects ResizeObservers on unmount", () => {
+    // Arrange
     const { containerRef, sidebarRef, layoutRef } = makeRefs();
 
     const { unmount } = renderHook(() =>
       useAnnotationLayout({ annotations: [], containerRef, sidebarRef, layoutRef }),
     );
 
+    // Act
     unmount();
 
+    // Assert
     expect(disconnectSpy).toHaveBeenCalled();
   });
 
   it("connectors is empty when positions is empty", () => {
+    // Arrange
     const { containerRef, sidebarRef, layoutRef } = makeRefs();
 
+    // Act
     const { result } = renderHook(() =>
       useAnnotationLayout({ annotations: [], containerRef, sidebarRef, layoutRef }),
     );
 
+    // Assert
     expect(result.current.connectors).toEqual([]);
   });
 
   it("computes stepped connector path relative to layout element", () => {
+    // Arrange
     const { container, sidebar, layout, containerRef, sidebarRef, layoutRef } = makeRefs();
     const annotations = [makeAnnotation("a")];
 
@@ -229,7 +243,6 @@ describe("useAnnotationLayout", () => {
     mark.setAttribute("data-annotation-id", "a");
     container.appendChild(mark);
 
-    // container: right=850, mark: midY=210, sidebar: left=900, layout: left=50,top=50
     vi.spyOn(container, "getBoundingClientRect").mockReturnValue(new DOMRect(50, 50, 800, 2000));
     vi.spyOn(mark, "getBoundingClientRect").mockReturnValue(new DOMRect(100, 200, 80, 20));
     vi.spyOn(sidebar, "getBoundingClientRect").mockReturnValue(new DOMRect(900, 50, 280, 1000));
@@ -244,6 +257,7 @@ describe("useAnnotationLayout", () => {
       result.current.registerCard("a", cardEl);
     });
 
+    // Act — trigger resize to compute positions and connectors
     const lastCallback = resizeCallbacks[resizeCallbacks.length - 1];
     act(() => {
       lastCallback(
@@ -252,6 +266,7 @@ describe("useAnnotationLayout", () => {
       );
     });
 
+    // Assert
     expect(result.current.connectors).toHaveLength(1);
     const c = result.current.connectors[0];
     expect(c.id).toBe("a");
@@ -268,6 +283,7 @@ describe("useAnnotationLayout", () => {
   });
 
   it("produces no connector for annotations missing from positions", () => {
+    // Arrange
     const { container, sidebar, layout, containerRef, sidebarRef, layoutRef } = makeRefs();
     const annotations = [makeAnnotation("a"), makeAnnotation("b")];
 
@@ -291,6 +307,7 @@ describe("useAnnotationLayout", () => {
       result.current.registerCard("b", cardElB);
     });
 
+    // Act — trigger resize for both cards
     const lastCallback = resizeCallbacks[resizeCallbacks.length - 1];
     act(() => {
       lastCallback(
@@ -302,7 +319,7 @@ describe("useAnnotationLayout", () => {
       );
     });
 
-    // Only "a" should have a connector (b has no mark in DOM → no highlight top → not in positions)
+    // Assert — only "a" should have a connector (b has no mark in DOM)
     const ids = result.current.connectors.map((c) => c.id);
     expect(ids).toContain("a");
     expect(ids).not.toContain("b");

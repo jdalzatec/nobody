@@ -35,10 +35,7 @@ export function useAnnotationLayout({
     annotationsRef.current = annotations;
   }, [annotations]);
 
-  const annotationKey = useMemo(
-    () => annotations.map((a) => a.id).join(","),
-    [annotations],
-  );
+  const annotationKey = useMemo(() => annotations.map((a) => a.id).join(","), [annotations]);
 
   const recomputeLayout = useCallback(() => {
     const tops = measureHighlightTops(

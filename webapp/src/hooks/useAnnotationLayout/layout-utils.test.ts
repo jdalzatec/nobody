@@ -18,32 +18,42 @@ const makeAnnotation = (id: string): Annotation => ({
 
 describe("measureHighlightTops", () => {
   it("returns empty map when annotations is empty", () => {
+    // Arrange
     const container = document.createElement("div");
     const sidebar = document.createElement("div");
 
+    // Act
     const result = measureHighlightTops([], container, sidebar);
 
+    // Assert
     expect(result.size).toBe(0);
   });
 
   it("returns empty map when container is null", () => {
+    // Arrange
     const sidebar = document.createElement("div");
 
+    // Act
     const result = measureHighlightTops([makeAnnotation("a")], null, sidebar);
 
+    // Assert
     expect(result.size).toBe(0);
   });
 
   it("returns empty map when no matching marks exist", () => {
+    // Arrange
     const container = document.createElement("div");
     const sidebar = document.createElement("div");
 
+    // Act
     const result = measureHighlightTops([makeAnnotation("a")], container, sidebar);
 
+    // Assert
     expect(result.size).toBe(0);
   });
 
   it("returns highlight midpoint Y relative to sidebar top", () => {
+    // Arrange
     const container = document.createElement("div");
     const mark = document.createElement("mark");
     mark.setAttribute("data-annotation-id", "a");
@@ -51,20 +61,18 @@ describe("measureHighlightTops", () => {
 
     const sidebar = document.createElement("div");
 
-    vi.spyOn(mark, "getBoundingClientRect").mockReturnValue(
-      new DOMRect(0, 150, 100, 20),
-    );
-    vi.spyOn(sidebar, "getBoundingClientRect").mockReturnValue(
-      new DOMRect(0, 50, 280, 1000),
-    );
+    vi.spyOn(mark, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 150, 100, 20));
+    vi.spyOn(sidebar, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 50, 280, 1000));
 
+    // Act
     const result = measureHighlightTops([makeAnnotation("a")], container, sidebar);
 
-    // midY = 150 + 20/2 = 160, sidebarTop = 50 → 110
+    // Assert — midY = 150 + 20/2 = 160, sidebarTop = 50 → 110
     expect(result.get("a")).toBe(110);
   });
 
   it("skips annotations whose mark is absent", () => {
+    // Arrange
     const container = document.createElement("div");
     const mark = document.createElement("mark");
     mark.setAttribute("data-annotation-id", "a");
@@ -72,19 +80,17 @@ describe("measureHighlightTops", () => {
 
     const sidebar = document.createElement("div");
 
-    vi.spyOn(mark, "getBoundingClientRect").mockReturnValue(
-      new DOMRect(0, 150, 100, 20),
-    );
-    vi.spyOn(sidebar, "getBoundingClientRect").mockReturnValue(
-      new DOMRect(0, 50, 280, 1000),
-    );
+    vi.spyOn(mark, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 150, 100, 20));
+    vi.spyOn(sidebar, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 50, 280, 1000));
 
+    // Act
     const result = measureHighlightTops(
       [makeAnnotation("a"), makeAnnotation("b")],
       container,
       sidebar,
     );
 
+    // Assert
     expect(result.size).toBe(1);
     expect(result.has("a")).toBe(true);
     expect(result.has("b")).toBe(false);
@@ -93,23 +99,27 @@ describe("measureHighlightTops", () => {
 
 describe("resolveOverlaps", () => {
   it("returns empty map for empty input", () => {
+    // Arrange & Act
     const result = resolveOverlaps(new Map(), new Map());
 
+    // Assert
     expect(result.size).toBe(0);
   });
 
   it("centers a single card on its highlight midpoint", () => {
-    // midY=100, cardHeight=40 → desired top = 100 - 20 = 80
+    // Arrange — midY=100, cardHeight=40 → desired top = 100 - 20 = 80
     const midYs = new Map([["a", 100]]);
     const heights = new Map([["a", 40]]);
 
+    // Act
     const result = resolveOverlaps(midYs, heights);
 
+    // Assert
     expect(result.get("a")).toBe(80);
   });
 
   it("centers two far-apart annotations independently", () => {
-    // a: midY=100, h=40 → top=80; b: midY=300, h=40 → top=280
+    // Arrange — a: midY=100, h=40 → top=80; b: midY=300, h=40 → top=280
     const midYs = new Map([
       ["a", 100],
       ["b", 300],
@@ -119,13 +129,16 @@ describe("resolveOverlaps", () => {
       ["b", 40],
     ]);
 
+    // Act
     const result = resolveOverlaps(midYs, heights);
 
+    // Assert
     expect(result.get("a")).toBe(80);
     expect(result.get("b")).toBe(280);
   });
 
   it("pushes second annotation below first when centering causes overlap", () => {
+    // Arrange
     // a: midY=100, h=60 → desired=70, cursor after a = 70+60+8=138
     // b: midY=110, h=40 → desired=90, but cursor=138 → placed at 138
     const midYs = new Map([
@@ -137,13 +150,16 @@ describe("resolveOverlaps", () => {
       ["b", 40],
     ]);
 
+    // Act
     const result = resolveOverlaps(midYs, heights);
 
+    // Assert
     expect(result.get("a")).toBe(70);
     expect(result.get("b")).toBe(70 + 60 + 8);
   });
 
   it("cascades pushes through three annotations", () => {
+    // Arrange
     // a: midY=100, h=60 → desired=70
     // b: midY=110, h=60 → desired=80, cursor=70+60+8=138 → 138
     // c: midY=120, h=40 → desired=100, cursor=138+60+8=206 → 206
@@ -158,8 +174,10 @@ describe("resolveOverlaps", () => {
       ["c", 40],
     ]);
 
+    // Act
     const result = resolveOverlaps(midYs, heights);
 
+    // Assert
     const aTop = 70;
     expect(result.get("a")).toBe(aTop);
     const bTop = aTop + 60 + 8;
@@ -169,6 +187,7 @@ describe("resolveOverlaps", () => {
   });
 
   it("handles two annotations at the same highlight midpoint", () => {
+    // Arrange
     // a: midY=100, h=50 → desired=75, cursor after=75+50+8=133
     // b: midY=100, h=50 → desired=75, cursor=133 → 133
     const midYs = new Map([
@@ -180,27 +199,33 @@ describe("resolveOverlaps", () => {
       ["b", 50],
     ]);
 
+    // Act
     const result = resolveOverlaps(midYs, heights);
 
+    // Assert
     expect(result.get("a")).toBe(75);
     expect(result.get("b")).toBe(75 + 50 + 8);
   });
 
   it("excludes annotations missing from cardHeights", () => {
+    // Arrange
     const midYs = new Map([
       ["a", 100],
       ["b", 200],
     ]);
     const heights = new Map([["a", 50]]);
 
+    // Act
     const result = resolveOverlaps(midYs, heights);
 
+    // Assert
     expect(result.size).toBe(1);
     expect(result.has("a")).toBe(true);
     expect(result.has("b")).toBe(false);
   });
 
   it("respects custom gap value", () => {
+    // Arrange
     // a: midY=100, h=60 → desired=70, cursor after=70+60+20=150
     // b: midY=110, h=40 → desired=90, cursor=150 → 150
     const midYs = new Map([
@@ -212,8 +237,10 @@ describe("resolveOverlaps", () => {
       ["b", 40],
     ]);
 
+    // Act
     const result = resolveOverlaps(midYs, heights, 20);
 
+    // Assert
     expect(result.get("a")).toBe(70);
     expect(result.get("b")).toBe(70 + 60 + 20);
   });
