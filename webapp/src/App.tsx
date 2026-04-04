@@ -1,9 +1,11 @@
 import { Spin, Alert } from "antd";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
+import { AnnotationConnectors } from "./components/AnnotationConnectors";
 import { AnnotationPopover } from "./components/AnnotationPopover";
 import { AnnotationSidebar } from "./components/AnnotationSidebar";
 import { MarkdownViewer } from "./components/MarkdownViewer";
+import { useAnnotationLayout } from "./hooks/useAnnotationLayout";
 import { useAnnotations } from "./hooks/useAnnotations";
 import "./App.css";
 
@@ -20,6 +22,17 @@ export function App() {
     saveAnnotation,
     cancelAnnotation,
   } = useAnnotations();
+
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const layoutRef = useRef<HTMLDivElement>(null);
+
+  const { positions, containerHeight, connectors, registerCard, unregisterCard } =
+    useAnnotationLayout({
+      annotations,
+      containerRef,
+      sidebarRef,
+      layoutRef,
+    });
 
   useEffect(() => {
     fetch("/file.md")
@@ -75,11 +88,19 @@ export function App() {
     : null;
 
   return (
-    <div className="app-layout">
+    <div className="app-layout" ref={layoutRef}>
       <div className="markdown-body markdown-column" ref={containerRef} onMouseUp={handleMouseUp}>
         <MarkdownViewer content={content} />
       </div>
-      <AnnotationSidebar annotations={annotations} />
+      <AnnotationSidebar
+        annotations={annotations}
+        sidebarRef={sidebarRef}
+        positions={positions}
+        containerHeight={containerHeight}
+        registerCard={registerCard}
+        unregisterCard={unregisterCard}
+      />
+      <AnnotationConnectors connectors={connectors} />
       {pendingSelection && popoverPosition && (
         <AnnotationPopover
           position={popoverPosition}
