@@ -53,6 +53,7 @@ export function AnnotationSidebar({
             position: "absolute",
             top: positions.get(annotation.id) ?? 0,
             width: "100%",
+            visibility: positions.has(annotation.id) ? "visible" : "hidden",
           }}
         >
           <Card
