@@ -2,6 +2,7 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 
 import { highlightRange, removePendingHighlight } from "../../utils/range-utils";
+
 import { useAnnotations } from "./useAnnotations";
 
 vi.mock("../../utils/range-utils", () => ({

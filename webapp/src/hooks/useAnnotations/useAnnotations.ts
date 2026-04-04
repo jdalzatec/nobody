@@ -1,10 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 
-import {
-  serializeRange,
-  highlightRange,
-  removePendingHighlight,
-} from "../../utils/range-utils";
+import { serializeRange, highlightRange, removePendingHighlight } from "../../utils/range-utils";
 
 import type { Annotation, SerializedRange } from "../../types";
 
@@ -20,20 +16,17 @@ export function useAnnotations() {
   } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleTextSelected = useCallback(
-    (range: Range, rect: DOMRect) => {
-      if (!containerRef.current) return;
+  const handleTextSelected = useCallback((range: Range, rect: DOMRect) => {
+    if (!containerRef.current) return;
 
-      // Clean up any existing pending highlight
-      removePendingHighlight(containerRef.current);
+    // Clean up any existing pending highlight
+    removePendingHighlight(containerRef.current);
 
-      const serialized = serializeRange(range, containerRef.current);
-      highlightRange(serialized, containerRef.current, PENDING_ID, PENDING_CLASS);
+    const serialized = serializeRange(range, containerRef.current);
+    highlightRange(serialized, containerRef.current, PENDING_ID, PENDING_CLASS);
 
-      setPendingSelection({ range, rect, serialized });
-    },
-    [],
-  );
+    setPendingSelection({ range, rect, serialized });
+  }, []);
 
   const saveAnnotation = useCallback(
     (comment: string) => {
