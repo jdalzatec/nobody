@@ -13,6 +13,7 @@ export function useAnnotations() {
     range: Range;
     rect: DOMRect;
     serialized: SerializedRange;
+    text: string;
   } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -22,10 +23,11 @@ export function useAnnotations() {
     // Clean up any existing pending highlight
     removePendingHighlight(containerRef.current);
 
+    const text = range.toString();
     const serialized = serializeRange(range, containerRef.current);
     highlightRange(serialized, containerRef.current, PENDING_ID, PENDING_CLASS);
 
-    setPendingSelection({ range, rect, serialized });
+    setPendingSelection({ range, rect, serialized, text });
   }, []);
 
   const saveAnnotation = useCallback(
@@ -40,7 +42,7 @@ export function useAnnotations() {
 
       const newAnnotation: Annotation = {
         id,
-        text: pendingSelection.range.toString(),
+        text: pendingSelection.text,
         comment,
         range: pendingSelection.serialized,
       };
