@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 
 import { describe, it, expect } from "vitest";
 
-import { serializeRange, highlightRange } from "./range-utils";
+import { serializeRange, highlightRange, removePendingHighlight } from "./range-utils";
 
 describe("serializeRange", () => {
   it("serializes a range within a single text node", () => {
@@ -131,5 +131,72 @@ describe("highlightRange", () => {
 
     // Assert
     expect(container.querySelectorAll("mark").length).toBe(0);
+  });
+
+  it("applies a custom CSS class when provided", () => {
+    // Arrange
+    const container = document.createElement("div");
+    container.innerHTML = "<p>Hello</p>";
+    const serialized = {
+      startContainerPath: [0, 0],
+      startOffset: 0,
+      endContainerPath: [0, 0],
+      endOffset: 5,
+    };
+
+    // Act
+    highlightRange(serialized, container, "ann-custom", "my-custom-class");
+
+    // Assert
+    const mark = container.querySelector("mark");
+    expect(mark).not.toBeNull();
+    expect(mark?.className).toBe("my-custom-class");
+  });
+});
+
+describe("removePendingHighlight", () => {
+  it("unwraps pending marks and restores text", () => {
+    // Arrange
+    const container = document.createElement("div");
+    container.innerHTML =
+      '<p>Hello <mark class="annotation-highlight-pending" data-annotation-id="pending">world</mark></p>';
+
+    // Act
+    removePendingHighlight(container);
+
+    // Assert
+    expect(container.querySelectorAll("mark").length).toBe(0);
+    expect(container.querySelector("p")?.textContent).toBe("Hello world");
+  });
+
+  it("normalizes text nodes after unwrapping", () => {
+    // Arrange
+    const container = document.createElement("div");
+    container.innerHTML =
+      '<p>Hello <mark class="annotation-highlight-pending" data-annotation-id="pending">world</mark>!</p>';
+
+    // Act
+    removePendingHighlight(container);
+
+    // Assert
+    const p = container.querySelector("p");
+    expect(p?.childNodes.length).toBe(1);
+    expect(p?.textContent).toBe("Hello world!");
+  });
+
+  it("does not remove non-pending marks", () => {
+    // Arrange
+    const container = document.createElement("div");
+    container.innerHTML =
+      '<p><mark class="annotation-highlight" data-annotation-id="ann-1">Hello</mark> <mark class="annotation-highlight-pending" data-annotation-id="pending">world</mark></p>';
+
+    // Act
+    removePendingHighlight(container);
+
+    // Assert
+    const marks = container.querySelectorAll("mark");
+    expect(marks.length).toBe(1);
+    expect(marks[0].textContent).toBe("Hello");
+    expect(marks[0].dataset.annotationId).toBe("ann-1");
   });
 });

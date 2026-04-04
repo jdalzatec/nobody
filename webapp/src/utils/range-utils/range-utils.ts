@@ -30,10 +30,24 @@ export function serializeRange(range: Range, container: HTMLElement): Serialized
   };
 }
 
+export function removePendingHighlight(container: HTMLElement): void {
+  const marks = container.querySelectorAll('mark[data-annotation-id="pending"]');
+  for (const mark of marks) {
+    const parent = mark.parentNode;
+    if (!parent) continue;
+    while (mark.firstChild) {
+      parent.insertBefore(mark.firstChild, mark);
+    }
+    parent.removeChild(mark);
+    parent.normalize();
+  }
+}
+
 export function highlightRange(
   serialized: SerializedRange,
   container: HTMLElement,
   annotationId: string,
+  className: string = "annotation-highlight",
 ): void {
   const startNode = resolveNodePath(serialized.startContainerPath, container);
   const endNode = resolveNodePath(serialized.endContainerPath, container);
@@ -47,14 +61,20 @@ export function highlightRange(
 
   for (let i = textNodes.length - 1; i >= 0; i--) {
     const { node, start, end } = textNodes[i];
-    wrapTextNode(node, start, end, annotationId);
+    wrapTextNode(node, start, end, annotationId, className);
   }
 }
 
-function wrapTextNode(node: Text, start: number, end: number, annotationId: string): void {
+function wrapTextNode(
+  node: Text,
+  start: number,
+  end: number,
+  annotationId: string,
+  className: string,
+): void {
   const text = node.data;
   const mark = document.createElement("mark");
-  mark.className = "annotation-highlight";
+  mark.className = className;
   mark.dataset.annotationId = annotationId;
 
   if (start === 0 && end === text.length) {
