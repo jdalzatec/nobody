@@ -30,6 +30,19 @@ export function serializeRange(range: Range, container: HTMLElement): Serialized
   };
 }
 
+export function removeHighlightById(container: HTMLElement, annotationId: string): void {
+  const marks = container.querySelectorAll(`mark[data-annotation-id="${annotationId}"]`);
+  for (const mark of marks) {
+    const parent = mark.parentNode;
+    if (!parent) continue;
+    while (mark.firstChild) {
+      parent.insertBefore(mark.firstChild, mark);
+    }
+    parent.removeChild(mark);
+    parent.normalize();
+  }
+}
+
 export function removePendingHighlight(container: HTMLElement): void {
   const marks = container.querySelectorAll('mark[data-annotation-id="pending"]');
   for (const mark of marks) {

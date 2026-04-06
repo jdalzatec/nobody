@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 
 import { describe, it, expect } from "vitest";
 
-import { serializeRange, highlightRange, removePendingHighlight } from "./range-utils";
+import {
+  serializeRange,
+  highlightRange,
+  removeHighlightById,
+  removePendingHighlight,
+} from "./range-utils";
 
 describe("serializeRange", () => {
   it("serializes a range within a single text node", () => {
@@ -198,5 +203,52 @@ describe("removePendingHighlight", () => {
     expect(marks.length).toBe(1);
     expect(marks[0].textContent).toBe("Hello");
     expect(marks[0].dataset.annotationId).toBe("ann-1");
+  });
+});
+
+describe("removeHighlightById", () => {
+  it("removes marks matching the given annotation ID", () => {
+    // Arrange
+    const container = document.createElement("div");
+    container.innerHTML =
+      '<p><mark class="annotation-highlight" data-annotation-id="ann-1">Hello</mark> world</p>';
+
+    // Act
+    removeHighlightById(container, "ann-1");
+
+    // Assert
+    expect(container.querySelectorAll("mark").length).toBe(0);
+    expect(container.querySelector("p")?.textContent).toBe("Hello world");
+  });
+
+  it("normalizes text nodes after unwrapping", () => {
+    // Arrange
+    const container = document.createElement("div");
+    container.innerHTML =
+      '<p>Say <mark class="annotation-highlight" data-annotation-id="ann-2">hello</mark> world</p>';
+
+    // Act
+    removeHighlightById(container, "ann-2");
+
+    // Assert
+    const p = container.querySelector("p");
+    expect(p?.childNodes.length).toBe(1);
+    expect(p?.textContent).toBe("Say hello world");
+  });
+
+  it("does not remove marks with a different annotation ID", () => {
+    // Arrange
+    const container = document.createElement("div");
+    container.innerHTML =
+      '<p><mark class="annotation-highlight" data-annotation-id="ann-1">Hello</mark> <mark class="annotation-highlight" data-annotation-id="ann-2">world</mark></p>';
+
+    // Act
+    removeHighlightById(container, "ann-1");
+
+    // Assert
+    const marks = container.querySelectorAll("mark");
+    expect(marks.length).toBe(1);
+    expect(marks[0].textContent).toBe("world");
+    expect(marks[0].dataset.annotationId).toBe("ann-2");
   });
 });

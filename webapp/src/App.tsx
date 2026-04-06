@@ -17,10 +17,15 @@ export function App() {
   const {
     annotations,
     pendingSelection,
+    editingAnnotationId,
     containerRef,
     handleTextSelected,
     saveAnnotation,
     cancelAnnotation,
+    deleteAnnotation,
+    startEditing,
+    saveEdit,
+    cancelEdit,
   } = useAnnotations();
 
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -104,6 +109,11 @@ export function App() {
         containerHeight={containerHeight}
         registerCard={registerCard}
         unregisterCard={unregisterCard}
+        editingAnnotationId={editingAnnotationId}
+        onDelete={deleteAnnotation}
+        onStartEditing={startEditing}
+        onSaveEdit={saveEdit}
+        onCancelEdit={cancelEdit}
       />
       <AnnotationConnectors connectors={connectors} />
       {pendingSelection && popoverPosition && (
