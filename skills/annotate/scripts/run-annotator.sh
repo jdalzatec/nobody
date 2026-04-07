@@ -22,10 +22,8 @@ if ! docker info > /dev/null 2>&1; then
   exit 1
 fi
 
-if ! docker image inspect "$IMAGE" > /dev/null 2>&1; then
-  echo "Image $IMAGE not found locally. Pulling from Docker Hub..."
-  docker pull "$IMAGE"
-fi
+echo "Pulling latest $IMAGE from Docker Hub..."
+docker pull "$IMAGE"
 
 if docker ps -q -f name="$CONTAINER_NAME" | grep -q .; then
   echo "Stopping existing nobody container..."
