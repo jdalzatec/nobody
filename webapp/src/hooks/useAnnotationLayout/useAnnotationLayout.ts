@@ -16,6 +16,10 @@ interface UseAnnotationLayoutParams {
   layoutRef: React.RefObject<HTMLDivElement | null>;
 }
 
+/**
+ * Hook that positions sidebar cards next to their corresponding highlights
+ * and computes SVG connector paths between them.
+ */
 export function useAnnotationLayout({
   annotations,
   containerRef,
@@ -126,7 +130,6 @@ export function useAnnotationLayout({
 
   const unregisterCard = useCallback((id: string) => {
     cardRefsMap.current.delete(id);
-    cardHeightsRef.current.delete(id);
   }, []);
 
   useEffect(() => {

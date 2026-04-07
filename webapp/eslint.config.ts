@@ -12,7 +12,7 @@ import type { ESLint } from "eslint";
 
 export default defineConfig(
   {
-    ignores: ["dist/**", "coverage/**", "node_modules/**"],
+    ignores: ["dist/**", "coverage/**", "node_modules/**", "server/**"],
   },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,

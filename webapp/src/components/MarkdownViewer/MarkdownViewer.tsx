@@ -1,6 +1,9 @@
+import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import rehypeSourcePositions from "../../lib/rehype-source-positions";
+import { stripCriticMarkup } from "../../lib/remark-critic-markup";
 import { MermaidBlock } from "../MermaidBlock";
 
 import type { ReactNode } from "react";
@@ -42,9 +45,15 @@ const components: Components = {
 };
 
 export function MarkdownViewer({ content }: MarkdownViewerProps) {
+  const stripped = useMemo(() => stripCriticMarkup(content), [content]);
+
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-      {content}
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeSourcePositions]}
+      components={components}
+    >
+      {stripped}
     </ReactMarkdown>
   );
 }

@@ -37,7 +37,7 @@ MD_FILE_ABS="$(cd "$(dirname "$MD_FILE")" && pwd)/$(basename "$MD_FILE")"
 docker run --rm -d \
   --name "$CONTAINER_NAME" \
   -p "$PORT:80" \
-  -v "$MD_FILE_ABS:/usr/share/nginx/html/file.md:ro" \
+  -v "$MD_FILE_ABS:/data/file.md" \
   "$IMAGE" > /dev/null
 
 echo "Nobody is running at http://localhost:$PORT"

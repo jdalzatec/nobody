@@ -7,6 +7,8 @@ import { AnnotationSidebar } from "./components/AnnotationSidebar";
 import { MarkdownViewer } from "./components/MarkdownViewer";
 import { useAnnotationLayout } from "./hooks/useAnnotationLayout";
 import { useAnnotations } from "./hooks/useAnnotations";
+import { fetchMarkdown, saveMarkdown } from "./lib/api";
+import { applyPendingHighlight } from "./lib/dom-highlight";
 import "./App.css";
 
 export function App() {
@@ -14,11 +16,21 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef(0);
+
+  const handleSourceChange = useCallback((newSource: string) => {
+    scrollRef.current = window.scrollY;
+    setContent(newSource);
+    saveMarkdown(newSource).catch((err: Error) => {
+      console.error("Failed to save:", err.message);
+    });
+  }, []);
+
   const {
     annotations,
     pendingSelection,
-    editingAnnotationId,
-    containerRef,
+    editingAnnotationIndex,
     handleTextSelected,
     saveAnnotation,
     cancelAnnotation,
@@ -26,7 +38,7 @@ export function App() {
     startEditing,
     saveEdit,
     cancelEdit,
-  } = useAnnotations();
+  } = useAnnotations(content ?? "", handleSourceChange, containerRef);
 
   const sidebarRef = useRef<HTMLDivElement>(null);
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -40,11 +52,7 @@ export function App() {
     });
 
   useEffect(() => {
-    fetch("/file.md")
-      .then((res) => {
-        if (!res.ok) throw new Error(`Failed to load file.md (${String(res.status)})`);
-        return res.text();
-      })
+    fetchMarkdown()
       .then((text) => {
         setContent(text);
         setLoading(false);
@@ -54,6 +62,48 @@ export function App() {
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollRef.current);
+      });
+    }
+  }, [content]);
+
+  const [activeAnnotationId, setActiveAnnotationIdRaw] = useState<string | null>(null);
+  const suppressActivationRef = useRef(false);
+  const setActiveAnnotationId = useCallback((id: string | null) => {
+    if (id !== null && suppressActivationRef.current) return;
+    setActiveAnnotationIdRaw(id);
+  }, []);
+
+  useEffect(() => {
+    if (!suppressActivationRef.current) return;
+    const handleMouseMove = () => {
+      suppressActivationRef.current = false;
+    };
+    document.addEventListener("mousemove", handleMouseMove, { once: true });
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+    };
+  });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const marks = container.querySelectorAll("mark.annotation");
+    for (const mark of marks) {
+      if (
+        activeAnnotationId !== null &&
+        mark.getAttribute("data-annotation-id") === activeAnnotationId
+      ) {
+        mark.classList.add("active");
+      } else {
+        mark.classList.remove("active");
+      }
+    }
+  }, [activeAnnotationId, content]);
 
   const [popoverPosition, setPopoverPosition] = useState<{ top: number; left: number } | null>(
     null,
@@ -65,7 +115,11 @@ export function App() {
     const range = selection.getRangeAt(0);
     if (!containerRef.current.contains(range.commonAncestorContainer)) return;
     const rect = range.getBoundingClientRect();
-    handleTextSelected(range, rect);
+    const accepted = handleTextSelected(range);
+    if (!accepted) return;
+
+    applyPendingHighlight(range);
+    selection.removeAllRanges();
 
     const layoutRect = layoutRef.current?.getBoundingClientRect();
     if (layoutRect) {
@@ -74,7 +128,27 @@ export function App() {
         left: rect.left - layoutRect.left,
       });
     }
-  }, [containerRef, handleTextSelected, layoutRef]);
+  }, [handleTextSelected]);
+
+  const handleMouseOverMarks = useCallback(
+    (e: React.MouseEvent) => {
+      const mark = (e.target as HTMLElement).closest("mark.annotation");
+      if (mark) {
+        setActiveAnnotationId(mark.getAttribute("data-annotation-id"));
+      }
+    },
+    [setActiveAnnotationId],
+  );
+
+  const handleMouseOutMarks = useCallback(
+    (e: React.MouseEvent) => {
+      const mark = (e.target as HTMLElement).closest("mark.annotation");
+      if (mark) {
+        setActiveAnnotationId(null);
+      }
+    },
+    [setActiveAnnotationId],
+  );
 
   if (loading) {
     return (
@@ -99,7 +173,13 @@ export function App() {
 
   return (
     <div className="app-layout" ref={layoutRef}>
-      <div className="markdown-body markdown-column" ref={containerRef} onMouseUp={handleMouseUp}>
+      <div
+        className="markdown-body markdown-column"
+        ref={containerRef}
+        onMouseUp={handleMouseUp}
+        onMouseOver={handleMouseOverMarks}
+        onMouseOut={handleMouseOutMarks}
+      >
         <MarkdownViewer content={content} />
       </div>
       <AnnotationSidebar
@@ -109,11 +189,23 @@ export function App() {
         containerHeight={containerHeight}
         registerCard={registerCard}
         unregisterCard={unregisterCard}
-        editingAnnotationId={editingAnnotationId}
-        onDelete={deleteAnnotation}
+        editingAnnotationIndex={editingAnnotationIndex}
+        activeAnnotationId={activeAnnotationId}
+        onActivate={setActiveAnnotationId}
+        onDelete={(index: number) => {
+          suppressActivationRef.current = true;
+          deleteAnnotation(index);
+          setActiveAnnotationIdRaw(null);
+        }}
         onStartEditing={startEditing}
-        onSaveEdit={saveEdit}
-        onCancelEdit={cancelEdit}
+        onSaveEdit={(comment: string) => {
+          saveEdit(comment);
+          setActiveAnnotationId(null);
+        }}
+        onCancelEdit={() => {
+          cancelEdit();
+          setActiveAnnotationId(null);
+        }}
       />
       <AnnotationConnectors connectors={connectors} />
       {pendingSelection && popoverPosition && (
