@@ -84,3 +84,7 @@ Rules for the summary:
 - **Preserve the document's structure and voice.** You're editing, not rewriting. Keep the original document style and organization unless a comment specifically asks for restructuring.
 - **Verify before you write.** If addressing a comment requires checking the codebase, check the codebase. Don't guess.
 - **Clean output only.** The final document must have zero CriticMarkup syntax. Run a grep for `{==`, `{>>`, `{--`, `{++`, `{~~` to confirm before saving.
+
+## After review
+
+After addressing all of the comments, the user may want to annotate the new document version. So, use the /annotate given-document.md skill to serve the new document to the user and they can add more notes.

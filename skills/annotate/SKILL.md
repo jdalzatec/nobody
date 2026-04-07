@@ -3,6 +3,8 @@ name: annotate
 description: Launch the nobody webapp to view a markdown file in the browser. Use when the user wants to view, read, or annotate a markdown report.
 ---
 
+# Annotate
+
 ## What it does
 
 Runs a Docker container that serves a formatted, readable view of a markdown file in the browser.
