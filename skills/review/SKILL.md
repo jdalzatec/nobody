@@ -87,4 +87,4 @@ Rules for the summary:
 
 ## After review
 
-After addressing all of the comments, the user may want to annotate the new document version. So, use the /annotate given-document.md skill to serve the new document to the user and they can add more notes.
+After addressing all of the comments, the user may want to annotate the new document version. So, use the `/annotate given-document.md` skill to serve the new document to the user and they can add more notes.
