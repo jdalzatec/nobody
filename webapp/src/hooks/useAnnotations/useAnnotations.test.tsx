@@ -1,298 +1,152 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 
-import {
-  highlightRange,
-  removeHighlightById,
-  removePendingHighlight,
-} from "../../utils/range-utils";
+vi.mock("../../lib/source-search", () => ({
+  findBlockElement: vi.fn(() => {
+    const el = document.createElement("p");
+    el.setAttribute("data-block-id", "0");
+    el.setAttribute("data-start", "0");
+    el.setAttribute("data-end", "11");
+    el.textContent = "Hello world";
+    return el;
+  }),
+  findSelectedTextInSource: vi.fn(() => ({ start: 0, end: 5 })),
+}));
+
+vi.mock("../../lib/selection-validator", () => ({
+  canAnnotate: vi.fn(() => ({ valid: true })),
+  hasOverlap: vi.fn(() => false),
+}));
+
+import { canAnnotate, hasOverlap } from "../../lib/selection-validator";
+import { findSelectedTextInSource } from "../../lib/source-search";
 
 import { useAnnotations } from "./useAnnotations";
 
-vi.mock("../../utils/range-utils", () => ({
-  serializeRange: vi.fn(() => ({
-    startContainerPath: [0, 0],
-    startOffset: 0,
-    endContainerPath: [0, 0],
-    endOffset: 5,
-  })),
-  highlightRange: vi.fn(),
-  removeHighlightById: vi.fn(),
-  removePendingHighlight: vi.fn(),
-}));
-
 function createMockRange(text: string): Range {
-  const range = new Range();
-  Object.defineProperty(range, "toString", { value: () => text });
+  const el = document.createElement("p");
+  el.setAttribute("data-block-id", "0");
+  const textNode = document.createTextNode(text);
+  el.appendChild(textNode);
+  const range = document.createRange();
+  range.setStart(textNode, 0);
+  range.setEnd(textNode, text.length);
   return range;
 }
 
-function createMockRect(): DOMRect {
-  return new DOMRect(100, 200, 50, 20);
-}
-
-function setupWithContainer() {
-  const { result } = renderHook(() => useAnnotations());
-  const container = document.createElement("div");
-  Object.defineProperty(result.current.containerRef, "current", {
-    value: container,
-    writable: true,
-  });
-  return { result, container };
-}
-
-function setupWithAnnotation() {
-  const { result, container } = setupWithContainer();
-  act(() => {
-    result.current.handleTextSelected(createMockRange("hello"), createMockRect());
-  });
-  act(() => {
-    result.current.saveAnnotation("my comment");
-  });
-  return { result, container, annotationId: result.current.annotations[0].id };
+function setup(markdown = "Hello world") {
+  const onSourceChange = vi.fn();
+  const containerRef = { current: document.createElement("div") };
+  const { result } = renderHook(() => useAnnotations(markdown, onSourceChange, containerRef));
+  return { result, onSourceChange, containerRef };
 }
 
 describe("useAnnotations", () => {
-  it("starts with empty annotations and no pending selection", () => {
-    // Arrange & Act
-    const { result } = renderHook(() => useAnnotations());
+  it("derives annotations from markdown source", () => {
+    const { result } = setup("Hello {==world==}{>>note<<} end");
+    expect(result.current.annotations).toHaveLength(1);
+    expect(result.current.annotations[0].text).toBe("world");
+    expect(result.current.annotations[0].comment).toBe("note");
+    expect(result.current.annotations[0].id).toBe("0");
+  });
 
-    // Assert
-    expect(result.current.annotations).toEqual([]);
+  it("starts with no pending selection", () => {
+    const { result } = setup();
     expect(result.current.pendingSelection).toBeNull();
   });
 
-  it("sets pending selection when handleTextSelected is called", () => {
-    // Arrange
-    const { result, container } = setupWithContainer();
-    const range = createMockRange("hello");
-    const rect = createMockRect();
-    void container;
-
-    // Act
+  it("sets pending selection on valid handleTextSelected", () => {
+    const { result } = setup();
     act(() => {
-      result.current.handleTextSelected(range, rect);
-    });
-
-    // Assert
-    expect(result.current.pendingSelection).not.toBeNull();
-    expect(result.current.pendingSelection?.range).toBe(range);
-  });
-
-  it("applies pending highlight when text is selected", () => {
-    // Arrange
-    const { result, container } = setupWithContainer();
-
-    // Act
-    act(() => {
-      result.current.handleTextSelected(createMockRange("hello"), createMockRect());
-    });
-
-    // Assert
-    expect(vi.mocked(highlightRange)).toHaveBeenCalledWith(
-      expect.objectContaining({ startContainerPath: [0, 0] }),
-      container,
-      "pending",
-      "annotation-highlight-pending",
-    );
-  });
-
-  it("cleans up previous pending highlight on re-selection", () => {
-    // Arrange
-    const { result, container } = setupWithContainer();
-    act(() => {
-      result.current.handleTextSelected(createMockRange("first"), createMockRect());
-    });
-    vi.mocked(removePendingHighlight).mockClear();
-
-    // Act
-    act(() => {
-      result.current.handleTextSelected(createMockRange("second"), createMockRect());
-    });
-
-    // Assert
-    expect(vi.mocked(removePendingHighlight)).toHaveBeenCalledWith(container);
-  });
-
-  it("clears pending selection on cancelAnnotation", () => {
-    // Arrange
-    const { result } = setupWithContainer();
-    act(() => {
-      result.current.handleTextSelected(createMockRange("hello"), createMockRect());
+      result.current.handleTextSelected(createMockRange("Hello"));
     });
     expect(result.current.pendingSelection).not.toBeNull();
+    expect(result.current.pendingSelection?.text).toBe("Hello");
+  });
 
-    // Act
+  it("rejects selection when canAnnotate returns invalid", () => {
+    vi.mocked(canAnnotate).mockReturnValueOnce({ valid: false, reason: "empty" });
+    const { result } = setup();
     act(() => {
-      result.current.cancelAnnotation();
+      result.current.handleTextSelected(createMockRange(""));
     });
-
-    // Assert
     expect(result.current.pendingSelection).toBeNull();
   });
 
-  it("removes pending highlight on cancel", () => {
-    // Arrange
-    const { result, container } = setupWithContainer();
+  it("rejects selection when findSelectedTextInSource returns null", () => {
+    vi.mocked(findSelectedTextInSource).mockReturnValueOnce(null);
+    const { result } = setup();
     act(() => {
-      result.current.handleTextSelected(createMockRange("hello"), createMockRect());
+      result.current.handleTextSelected(createMockRange("Hello"));
     });
-    vi.mocked(removePendingHighlight).mockClear();
-
-    // Act
-    act(() => {
-      result.current.cancelAnnotation();
-    });
-
-    // Assert
-    expect(vi.mocked(removePendingHighlight)).toHaveBeenCalledWith(container);
+    expect(result.current.pendingSelection).toBeNull();
   });
 
-  it("adds an annotation and clears pending selection on saveAnnotation", () => {
-    // Arrange
-    const { result } = setupWithContainer();
+  it("rejects selection when hasOverlap returns true", () => {
+    vi.mocked(hasOverlap).mockReturnValueOnce(true);
+    const { result } = setup();
     act(() => {
-      result.current.handleTextSelected(createMockRange("hello"), createMockRect());
+      result.current.handleTextSelected(createMockRange("Hello"));
     });
+    expect(result.current.pendingSelection).toBeNull();
+  });
 
-    // Act
+  it("calls onSourceChange with CriticMarkup on save", () => {
+    const { result, onSourceChange } = setup("Hello world");
+    act(() => {
+      result.current.handleTextSelected(createMockRange("Hello"));
+    });
     act(() => {
       result.current.saveAnnotation("my comment");
     });
-
-    // Assert
-    expect(result.current.annotations).toHaveLength(1);
-    expect(result.current.annotations[0].comment).toBe("my comment");
-    expect(result.current.annotations[0].text).toBe("hello");
+    expect(onSourceChange).toHaveBeenCalledWith("{==Hello==}{>>my comment<<} world");
     expect(result.current.pendingSelection).toBeNull();
   });
 
-  it("removes pending highlight and applies permanent highlight on save", () => {
-    // Arrange
-    const { result, container } = setupWithContainer();
+  it("calls onSourceChange on delete", () => {
+    const md = "Hello {==world==}{>>note<<} end";
+    const { result, onSourceChange } = setup(md);
     act(() => {
-      result.current.handleTextSelected(createMockRange("hello"), createMockRect());
+      result.current.deleteAnnotation(0);
     });
-    vi.mocked(removePendingHighlight).mockClear();
-    vi.mocked(highlightRange).mockClear();
-
-    // Act
-    act(() => {
-      result.current.saveAnnotation("my comment");
-    });
-
-    // Assert
-    expect(vi.mocked(removePendingHighlight)).toHaveBeenCalledWith(container);
-    expect(vi.mocked(highlightRange)).toHaveBeenCalledWith(
-      expect.objectContaining({ startContainerPath: [0, 0] }),
-      container,
-      expect.any(String),
-    );
+    expect(onSourceChange).toHaveBeenCalledWith("Hello world end");
   });
 
-  it("does nothing on saveAnnotation when there is no pending selection", () => {
-    // Arrange
-    const { result } = renderHook(() => useAnnotations());
-
-    // Act
+  it("calls onSourceChange on edit", () => {
+    const md = "Hello {==world==}{>>old<<} end";
+    const { result, onSourceChange } = setup(md);
     act(() => {
-      result.current.saveAnnotation("orphan comment");
+      result.current.startEditing(0);
     });
-
-    // Assert
-    expect(result.current.annotations).toEqual([]);
+    act(() => {
+      result.current.saveEdit("new");
+    });
+    expect(onSourceChange).toHaveBeenCalledWith("Hello {==world==}{>>new<<} end");
+    expect(result.current.editingAnnotationIndex).toBeNull();
   });
 
-  it("deletes an annotation and removes its highlight", () => {
-    // Arrange
-    const { result, container, annotationId } = setupWithAnnotation();
-    expect(result.current.annotations).toHaveLength(1);
-    vi.mocked(removeHighlightById).mockClear();
-
-    // Act
+  it("clears pending selection on cancel", () => {
+    const { result } = setup();
     act(() => {
-      result.current.deleteAnnotation(annotationId);
+      result.current.handleTextSelected(createMockRange("Hello"));
     });
-
-    // Assert
-    expect(result.current.annotations).toHaveLength(0);
-    expect(vi.mocked(removeHighlightById)).toHaveBeenCalledWith(container, annotationId);
+    expect(result.current.pendingSelection).not.toBeNull();
+    act(() => {
+      result.current.cancelAnnotation();
+    });
+    expect(result.current.pendingSelection).toBeNull();
   });
 
-  it("clears editingAnnotationId when the edited annotation is deleted", () => {
-    // Arrange
-    const { result, annotationId } = setupWithAnnotation();
+  it("clears editingAnnotationIndex when the edited annotation is deleted", () => {
+    const md = "Hello {==world==}{>>note<<} end";
+    const { result } = setup(md);
     act(() => {
-      result.current.startEditing(annotationId);
+      result.current.startEditing(0);
     });
-    expect(result.current.editingAnnotationId).toBe(annotationId);
-
-    // Act
+    expect(result.current.editingAnnotationIndex).toBe(0);
     act(() => {
-      result.current.deleteAnnotation(annotationId);
+      result.current.deleteAnnotation(0);
     });
-
-    // Assert
-    expect(result.current.editingAnnotationId).toBeNull();
-  });
-
-  it("sets editingAnnotationId when startEditing is called", () => {
-    // Arrange
-    const { result, annotationId } = setupWithAnnotation();
-
-    // Act
-    act(() => {
-      result.current.startEditing(annotationId);
-    });
-
-    // Assert
-    expect(result.current.editingAnnotationId).toBe(annotationId);
-  });
-
-  it("updates the comment and clears editing state on saveEdit", () => {
-    // Arrange
-    const { result, annotationId } = setupWithAnnotation();
-    act(() => {
-      result.current.startEditing(annotationId);
-    });
-
-    // Act
-    act(() => {
-      result.current.saveEdit("updated comment");
-    });
-
-    // Assert
-    expect(result.current.annotations[0].comment).toBe("updated comment");
-    expect(result.current.editingAnnotationId).toBeNull();
-  });
-
-  it("clears editing state without changing comment on cancelEdit", () => {
-    // Arrange
-    const { result, annotationId } = setupWithAnnotation();
-    act(() => {
-      result.current.startEditing(annotationId);
-    });
-
-    // Act
-    act(() => {
-      result.current.cancelEdit();
-    });
-
-    // Assert
-    expect(result.current.annotations[0].comment).toBe("my comment");
-    expect(result.current.editingAnnotationId).toBeNull();
-  });
-
-  it("does nothing on saveEdit when not editing", () => {
-    // Arrange
-    const { result } = setupWithAnnotation();
-
-    // Act
-    act(() => {
-      result.current.saveEdit("should not apply");
-    });
-
-    // Assert
-    expect(result.current.annotations[0].comment).toBe("my comment");
+    expect(result.current.editingAnnotationIndex).toBeNull();
   });
 });

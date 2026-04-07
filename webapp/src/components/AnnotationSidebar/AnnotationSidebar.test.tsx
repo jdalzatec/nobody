@@ -8,15 +8,11 @@ import { AnnotationSidebar } from "./AnnotationSidebar";
 import type { Annotation } from "../../types";
 
 const makeAnnotation = (overrides: Partial<Annotation> = {}): Annotation => ({
-  id: "ann-1",
+  id: "0",
   text: "selected text",
   comment: "my comment",
-  range: {
-    startContainerPath: [0, 0],
-    startOffset: 0,
-    endContainerPath: [0, 0],
-    endOffset: 13,
-  },
+  sourceStart: 0,
+  sourceEnd: 10,
   ...overrides,
 });
 
@@ -29,7 +25,9 @@ function defaultProps(overrides: Partial<Parameters<typeof AnnotationSidebar>[0]
     containerHeight: 0,
     registerCard: vi.fn(),
     unregisterCard: vi.fn(),
-    editingAnnotationId: null,
+    editingAnnotationIndex: null,
+    activeAnnotationId: null,
+    onActivate: vi.fn(),
     onDelete: vi.fn(),
     onStartEditing: vi.fn(),
     onSaveEdit: vi.fn(),
@@ -40,252 +38,164 @@ function defaultProps(overrides: Partial<Parameters<typeof AnnotationSidebar>[0]
 
 describe("AnnotationSidebar", () => {
   it("renders nothing when there are no annotations", () => {
-    // Arrange & Act
     const { container } = render(<AnnotationSidebar {...defaultProps({ annotations: [] })} />);
-
-    // Assert
     expect(container.querySelector(".annotation-sidebar")).toBeInTheDocument();
   });
 
   it("renders a card for each annotation", () => {
-    // Arrange
     const annotations = [
-      makeAnnotation({ id: "1", comment: "First" }),
-      makeAnnotation({ id: "2", comment: "Second" }),
-      makeAnnotation({ id: "3", comment: "Third" }),
+      makeAnnotation({ id: "0", comment: "First" }),
+      makeAnnotation({ id: "1", comment: "Second" }),
+      makeAnnotation({ id: "2", comment: "Third" }),
     ];
-
-    // Act
     render(<AnnotationSidebar {...defaultProps({ annotations })} />);
-
-    // Assert
     expect(screen.getByText("First")).toBeInTheDocument();
     expect(screen.getByText("Second")).toBeInTheDocument();
     expect(screen.getByText("Third")).toBeInTheDocument();
   });
 
   it("displays the selected text as a quote", () => {
-    // Arrange
     const annotations = [makeAnnotation({ text: "highlighted portion" })];
-
-    // Act
     render(<AnnotationSidebar {...defaultProps({ annotations })} />);
-
-    // Assert
     expect(screen.getByText("highlighted portion")).toBeInTheDocument();
   });
 
   it("displays the user comment", () => {
-    // Arrange
     const annotations = [makeAnnotation({ comment: "This is important" })];
-
-    // Act
     render(<AnnotationSidebar {...defaultProps({ annotations })} />);
-
-    // Assert
     expect(screen.getByText("This is important")).toBeInTheDocument();
   });
 
   it("applies the correct top from positions map", () => {
-    // Arrange
     const annotations = [
-      makeAnnotation({ id: "a" }),
-      makeAnnotation({ id: "b", comment: "Second" }),
+      makeAnnotation({ id: "0" }),
+      makeAnnotation({ id: "1", comment: "Second" }),
     ];
     const positions = new Map([
-      ["a", 100],
-      ["b", 250],
+      ["0", 100],
+      ["1", 250],
     ]);
-
-    // Act
     const { container } = render(
       <AnnotationSidebar {...defaultProps({ annotations, positions })} />,
     );
-
-    // Assert
     const wrappers = container.querySelectorAll<HTMLElement>(".annotation-sidebar > div");
     expect(wrappers[0].style.top).toBe("100px");
     expect(wrappers[1].style.top).toBe("250px");
   });
 
   it("calls registerCard on mount and unregisterCard on unmount", () => {
-    // Arrange
     const registerCard = vi.fn();
     const unregisterCard = vi.fn();
-    const annotations = [makeAnnotation({ id: "a" })];
-
-    // Act
+    const annotations = [makeAnnotation({ id: "0" })];
     const { unmount } = render(
       <AnnotationSidebar {...defaultProps({ annotations, registerCard, unregisterCard })} />,
     );
-
-    // Assert — registerCard called on mount
-    expect(registerCard).toHaveBeenCalledWith("a", expect.any(HTMLElement));
-
-    // Act — unmount
+    expect(registerCard).toHaveBeenCalledWith("0", expect.any(HTMLElement));
     unmount();
-
-    // Assert — unregisterCard called on unmount
-    expect(unregisterCard).toHaveBeenCalledWith("a");
+    expect(unregisterCard).toHaveBeenCalledWith("0");
   });
 
   it("renders Edit and Delete buttons on each card", () => {
-    // Arrange
     const annotations = [makeAnnotation()];
-
-    // Act
     render(<AnnotationSidebar {...defaultProps({ annotations })} />);
-
-    // Assert
     expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
   });
 
   it("shows delete confirmation when X is clicked", async () => {
-    // Arrange
-    const annotations = [makeAnnotation({ id: "ann-42" })];
-
-    // Act
+    const annotations = [makeAnnotation({ id: "0" })];
     render(<AnnotationSidebar {...defaultProps({ annotations })} />);
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
-
-    // Assert
     expect(screen.getByText("Are you sure you want to delete this note?")).toBeInTheDocument();
   });
 
-  it("calls onDelete when confirming deletion in Popconfirm", async () => {
-    // Arrange
+  it("calls onDelete with index when confirming deletion", async () => {
     const onDelete = vi.fn();
-    const annotations = [makeAnnotation({ id: "ann-42" })];
-
-    // Act
+    const annotations = [makeAnnotation({ id: "0" })];
     render(<AnnotationSidebar {...defaultProps({ annotations, onDelete })} />);
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     await userEvent.click(screen.getByRole("button", { name: "Yes" }));
-
-    // Assert
-    expect(onDelete).toHaveBeenCalledWith("ann-42");
+    expect(onDelete).toHaveBeenCalledWith(0);
   });
 
-  it("does not call onDelete when canceling deletion in Popconfirm", async () => {
-    // Arrange
+  it("does not call onDelete when canceling deletion", async () => {
     const onDelete = vi.fn();
-    const annotations = [makeAnnotation({ id: "ann-42" })];
-
-    // Act
+    const annotations = [makeAnnotation({ id: "0" })];
     render(<AnnotationSidebar {...defaultProps({ annotations, onDelete })} />);
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     await userEvent.click(screen.getByRole("button", { name: "No" }));
-
-    // Assert
     expect(onDelete).not.toHaveBeenCalled();
   });
 
-  it("calls onStartEditing with the annotation ID when pencil is clicked", async () => {
-    // Arrange
+  it("calls onStartEditing with index when pencil is clicked", async () => {
     const onStartEditing = vi.fn();
-    const annotations = [makeAnnotation({ id: "ann-42" })];
-
-    // Act
+    const annotations = [makeAnnotation({ id: "0" })];
     render(<AnnotationSidebar {...defaultProps({ annotations, onStartEditing })} />);
     await userEvent.click(screen.getByRole("button", { name: "Edit" }));
-
-    // Assert
-    expect(onStartEditing).toHaveBeenCalledWith("ann-42");
+    expect(onStartEditing).toHaveBeenCalledWith(0);
   });
 
   it("shows a textarea with current comment in edit mode", () => {
-    // Arrange
-    const annotations = [makeAnnotation({ id: "ann-1", comment: "original comment" })];
-
-    // Act
-    render(<AnnotationSidebar {...defaultProps({ annotations, editingAnnotationId: "ann-1" })} />);
-
-    // Assert
+    const annotations = [makeAnnotation({ id: "0", comment: "original comment" })];
+    render(<AnnotationSidebar {...defaultProps({ annotations, editingAnnotationIndex: 0 })} />);
     const textarea = screen.getByRole("textbox");
     expect(textarea).toHaveValue("original comment");
   });
 
   it("shows Save and Cancel buttons in edit mode", () => {
-    // Arrange
-    const annotations = [makeAnnotation({ id: "ann-1" })];
-
-    // Act
-    render(<AnnotationSidebar {...defaultProps({ annotations, editingAnnotationId: "ann-1" })} />);
-
-    // Assert
+    const annotations = [makeAnnotation({ id: "0" })];
+    render(<AnnotationSidebar {...defaultProps({ annotations, editingAnnotationIndex: 0 })} />);
     expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
   });
 
   it("calls onSaveEdit with updated comment when Save is clicked", async () => {
-    // Arrange
     const onSaveEdit = vi.fn();
-    const annotations = [makeAnnotation({ id: "ann-1", comment: "old" })];
-
-    // Act
+    const annotations = [makeAnnotation({ id: "0", comment: "old" })];
     render(
       <AnnotationSidebar
-        {...defaultProps({ annotations, editingAnnotationId: "ann-1", onSaveEdit })}
+        {...defaultProps({ annotations, editingAnnotationIndex: 0, onSaveEdit })}
       />,
     );
     const textarea = screen.getByRole("textbox");
     await userEvent.clear(textarea);
     await userEvent.type(textarea, "new comment");
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
-
-    // Assert
     expect(onSaveEdit).toHaveBeenCalledWith("new comment");
   });
 
   it("calls onCancelEdit when Cancel is clicked", async () => {
-    // Arrange
     const onCancelEdit = vi.fn();
-    const annotations = [makeAnnotation({ id: "ann-1" })];
-
-    // Act
+    const annotations = [makeAnnotation({ id: "0" })];
     render(
       <AnnotationSidebar
-        {...defaultProps({ annotations, editingAnnotationId: "ann-1", onCancelEdit })}
+        {...defaultProps({ annotations, editingAnnotationIndex: 0, onCancelEdit })}
       />,
     );
     await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
-
-    // Assert
     expect(onCancelEdit).toHaveBeenCalled();
   });
 
   it("disables Save button when textarea is empty in edit mode", async () => {
-    // Arrange
-    const annotations = [makeAnnotation({ id: "ann-1", comment: "text" })];
-
-    // Act
-    render(<AnnotationSidebar {...defaultProps({ annotations, editingAnnotationId: "ann-1" })} />);
+    const annotations = [makeAnnotation({ id: "0", comment: "text" })];
+    render(<AnnotationSidebar {...defaultProps({ annotations, editingAnnotationIndex: 0 })} />);
     const textarea = screen.getByRole("textbox");
     await userEvent.clear(textarea);
-
-    // Assert
     expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
   });
 
   it("does not call onSaveEdit or onCancelEdit when clicking outside in edit mode", async () => {
-    // Arrange
     const onSaveEdit = vi.fn();
     const onCancelEdit = vi.fn();
-    const annotations = [makeAnnotation({ id: "ann-1", comment: "original" })];
-
-    // Act
+    const annotations = [makeAnnotation({ id: "0", comment: "original" })];
     const { container } = render(
       <AnnotationSidebar
-        {...defaultProps({ annotations, editingAnnotationId: "ann-1", onSaveEdit, onCancelEdit })}
+        {...defaultProps({ annotations, editingAnnotationIndex: 0, onSaveEdit, onCancelEdit })}
       />,
     );
     const textarea = screen.getByRole("textbox");
     await userEvent.type(textarea, " changed");
-    // Simulate click outside the card
     await userEvent.click(container.querySelector("body") as Element);
-
-    // Assert — nothing should happen, both callbacks are not called
     expect(onSaveEdit).not.toHaveBeenCalled();
     expect(onCancelEdit).not.toHaveBeenCalled();
   });

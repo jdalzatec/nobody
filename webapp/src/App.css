@@ -198,6 +198,24 @@ body {
   margin-bottom: 0.25rem;
 }
 
+mark.annotation {
+  cursor: default;
+  background: #fef9c3;
+  border-bottom: 2px solid #fcd34d;
+  border-radius: 0.125rem;
+}
+
+mark.annotation.active {
+  background: rgb(187 247 208 / 70%);
+  border-bottom-color: #4ade80;
+}
+
+mark.annotation-pending {
+  background: rgb(187 247 208 / 70%);
+  border-bottom: 2px solid #4ade80;
+  border-radius: 0.125rem;
+}
+
 .annotation-highlight {
   cursor: default;
   background: #fef9c3;

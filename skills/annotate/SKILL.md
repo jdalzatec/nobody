@@ -17,3 +17,7 @@ The user provides a **markdown file path**, e.g. `/annotate research_20260402_00
 2. The script starts the container in the background on port 9303
 3. Tell the user the URL: **http://localhost:9303**
 4. If the user wants to stop it: `docker stop nobody`
+
+## Persistence
+
+The markdown file is mounted read-write. Annotations are stored inline using CriticMarkup syntax (`{==highlighted text==}{>>comment<<}`). Changes are written back to the original file automatically.

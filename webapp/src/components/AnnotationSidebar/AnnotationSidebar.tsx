@@ -13,9 +13,11 @@ interface AnnotationSidebarProps {
   containerHeight: number;
   registerCard: (id: string, el: HTMLElement) => void;
   unregisterCard: (id: string) => void;
-  editingAnnotationId: string | null;
-  onDelete: (id: string) => void;
-  onStartEditing: (id: string) => void;
+  editingAnnotationIndex: number | null;
+  activeAnnotationId: string | null;
+  onActivate: (id: string | null) => void;
+  onDelete: (index: number) => void;
+  onStartEditing: (index: number) => void;
   onSaveEdit: (newComment: string) => void;
   onCancelEdit: () => void;
 }
@@ -46,6 +48,15 @@ function EditableComment({
         onChange={(e) => {
           setDraft(e.target.value);
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            e.stopPropagation();
+            onCancelEdit();
+          } else if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            handleSave();
+          }
+        }}
         rows={3}
         style={{ minHeight: 60, resize: "vertical", fontSize: 14 }}
       />
@@ -68,7 +79,9 @@ export function AnnotationSidebar({
   containerHeight,
   registerCard,
   unregisterCard,
-  editingAnnotationId,
+  editingAnnotationIndex,
+  activeAnnotationId,
+  onActivate,
   onDelete,
   onStartEditing,
   onSaveEdit,
@@ -97,7 +110,7 @@ export function AnnotationSidebar({
       ref={sidebarRef}
       style={{ height: containerHeight || undefined }}
     >
-      {annotations.map((annotation) => (
+      {annotations.map((annotation, index) => (
         <div
           key={annotation.id}
           ref={refCallbacks.get(annotation.id)}
@@ -107,11 +120,22 @@ export function AnnotationSidebar({
             width: "100%",
             visibility: positions.has(annotation.id) ? "visible" : "hidden",
           }}
+          onMouseEnter={() => {
+            onActivate(annotation.id);
+          }}
+          onMouseLeave={() => {
+            if (activeAnnotationId === annotation.id) {
+              onActivate(null);
+            }
+          }}
         >
           <Card
             size="small"
             styles={{ body: { padding: 12 } }}
-            style={{ borderLeft: `3px solid ${token.colorPrimary}`, fontSize: 14 }}
+            style={{
+              borderLeft: `3px solid ${activeAnnotationId === annotation.id ? "#4ade80" : "#fcd34d"}`,
+              fontSize: 14,
+            }}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <Text strong style={{ fontSize: 12, color: token.colorTextSecondary }}>
@@ -123,7 +147,7 @@ export function AnnotationSidebar({
                   size="small"
                   icon={<EditOutlined />}
                   onClick={() => {
-                    onStartEditing(annotation.id);
+                    onStartEditing(index);
                   }}
                   aria-label="Edit"
                 />
@@ -131,7 +155,7 @@ export function AnnotationSidebar({
                   title="Delete note"
                   description="Are you sure you want to delete this note?"
                   onConfirm={() => {
-                    onDelete(annotation.id);
+                    onDelete(index);
                   }}
                   okText="Yes"
                   cancelText="No"
@@ -153,7 +177,7 @@ export function AnnotationSidebar({
             >
               {annotation.text}
             </blockquote>
-            {editingAnnotationId === annotation.id ? (
+            {editingAnnotationIndex === index ? (
               <EditableComment
                 annotation={annotation}
                 onSaveEdit={onSaveEdit}

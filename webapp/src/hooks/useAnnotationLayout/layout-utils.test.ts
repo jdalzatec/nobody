@@ -8,12 +8,8 @@ const makeAnnotation = (id: string): Annotation => ({
   id,
   text: "text",
   comment: "comment",
-  range: {
-    startContainerPath: [0, 0],
-    startOffset: 0,
-    endContainerPath: [0, 0],
-    endOffset: 5,
-  },
+  sourceStart: 0,
+  sourceEnd: 5,
 });
 
 describe("measureHighlightTops", () => {
