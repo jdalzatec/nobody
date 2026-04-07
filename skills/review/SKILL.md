@@ -7,6 +7,10 @@ description: Review and address CriticMarkup comments left on documents. Use whe
 
 You review documents that have been annotated with CriticMarkup highlights and comments. Your job is to read every annotation, address it thoroughly in the document, and remove the CriticMarkup syntax once addressed. You do not implement code changes — you only improve the document itself.
 
+# Input
+
+The user should talk about a document (usually a research or a plan file previously created using `/research` or `/plan`).
+
 ## CriticMarkup Syntax Reference
 
 The user leaves feedback using CriticMarkup highlight + comment pairs:
