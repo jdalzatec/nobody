@@ -3,6 +3,8 @@ name: research
 description: Analyze codebases to map dependencies, call chains, data flow, and component relationships. Use when the user asks how modules interact, what depends on what, or wants to trace behavior across files, or wants to understand some sofware. Not for writing new code or fixing bugs.
 ---
 
+# Research
+
 ## What it does
 
 Deep-dive research and analysis of software projects, systems, and codebases. Use when the user wants to understand how a project works, study a specific system or flow, trace relationships between components, map dependencies, investigate bugs by following code paths, or generally "figure out" how something in the code works. Triggers include phrases like "research", "study", "understand", "how does X work", "go through the flow", "look into", "investigate", "research", "understand", "analyze the code", "analyze the repository", "what does this module do", "trace the flow", "find the bug", "deep dive", or any request to read and comprehend a codebase or subsystem. Also triggers when the user points at a folder or file and wants a thorough understanding of it. Do NOT use for writing new features, refactoring, generating boilerplate, or fixing code — this skill is purely for investigation, comprehension, and reporting findings.
