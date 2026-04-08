@@ -86,7 +86,7 @@ Rules:
 - **Don't implement anything.** No code, no file creation beyond editing the plan document. The todo list is the deliverable.
 - **Reference the research.** If a research document exists and was referenced in the plan, use it to make tasks more specific (e.g., referencing exact file names, function signatures, or patterns discovered during research).
 - **Think about sequencing carefully.** A developer should be able to work through the list top to bottom without hitting a blocker caused by an out-of-order task.
-- **Follow TDD sequencing.** For every behavior being added or changed, the test task must come before the implementation task in the list. The developer should write the failing test first, then make it pass.
+- **Follow TDD sequencing.** For every behavior being added or changed, the test task must come before the implementation task in the list. The failing test todo must come first, then the todo that makes it pass.
 - **Match the existing test patterns.** Before writing any test-related todo, read the existing test files to understand the conventions used (file naming, folder structure, testing library usage, mock patterns, assertion style). Test todos must follow the same patterns, not introduce new ones.
 - **Include validation tasks.** Every phase that changes behavior should have at least one task for verifying the change works. Don't lump all testing into a final phase — validate as you go.
 
