@@ -32,6 +32,7 @@ Good tasks:
 - Are completable in one focused session (roughly 15 minutes to 2 hours of work)
 - Have a clear "done" state — you know when it's finished
 - Include the *why* briefly if the reason isn't obvious from context
+- Include a checkbox (`- [ ]`) so it can be tracked as a todo.
 
 Bad tasks:
 - Vague buckets: "handle edge cases" (which ones?)
