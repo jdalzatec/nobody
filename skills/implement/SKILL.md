@@ -24,6 +24,7 @@ These rules are non-negotiable. Follow them exactly:
 - **Do not add unnecessary comments or docstrings.** Only add a comment when the logic is genuinely non-obvious to a competent reader.
 - **Do not use `any` types.** Maintain strict typing throughout.
 - **Run the checkers continuously.** After each meaningful chunk of changes, run typecheck, linters, and tests to catch issues early. Do not batch up all changes and check only at the end.
+- **Do not invoke other skills.** Do not use `/annotate`, `/review`, `/plan`, `/research`, or any other skill during implementation. This skill runs alone, start to finish.
 
 ## Workflow
 
