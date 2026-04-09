@@ -19,7 +19,7 @@ The plan document must contain a todo list, a clear, ordered set of actionable i
 These rules are non-negotiable. Follow them exactly:
 
 - **Implement everything.** Do not cherry-pick tasks. Do not skip phases. Do not ask the user whether to proceed between phases.
-- **Mark the todos as completed in the plan document as you finish them.** The plan todo list is the live progress tracker. After completing each todo, update the plan document to mark it done using `- [x]`.
+- **Mark the phases as done in the plan document as you finish them.** After completing each phase, update the plan document to mark it done using `- [x]`.
 - **Do not stop until all tasks and phases are completed.** No mid-flow pauses, no "should I continue?", no check-ins. Keep going.
 - **Do not add unnecessary comments or docstrings.** Only add a comment when the logic is genuinely non-obvious to a competent reader.
 - **Do not use `any` types.** Maintain strict typing throughout.
@@ -29,7 +29,7 @@ These rules are non-negotiable. Follow them exactly:
 
 ### Step 1 - Read the plan
 
-Find and read the last created `plan_*.md` from the current session.  Understand the scope.
+Find and read the last created `plan_*.md` from the current session. Understand the scope.
 
 ### Step 2 - Execute todo by todo
 
@@ -38,9 +38,12 @@ Work through each todo in order.
 For each todo:
 1. Read the relevant existing files before changing them
 2. Make the changes
-3. Mark the todo as completed in the plan document
 
-### Step 3 - Executive report
+### Step 3 - Mark the phases as done
+
+After completing each phase, mark the phases you just implemented.
+
+### Step 4 - Executive report
 
 Once everything passes, give the user a short summary:
 
