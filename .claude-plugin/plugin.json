@@ -1,0 +1,21 @@
+{
+    "name": "nobody",
+    "description": "Core skills library for Claude Code: research, plan, annotate, review, todo, and implement",
+    "version": "1.0.0",
+    "author": {
+        "name": "Juan David Alzate Cardona",
+        "email": "jdalzatec@gmail.com"
+    },
+    "homepage": "https://github.com/jdalzatec/nobody",
+    "repository": "https://github.com/jdalzatec/nobody",
+    "license": "MIT",
+    "keywords": [
+        "skills",
+        "research",
+        "plan",
+        "annotate",
+        "review",
+        "todo",
+        "implement"
+    ]
+}

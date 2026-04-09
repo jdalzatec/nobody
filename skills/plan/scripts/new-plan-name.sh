@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-echo "plan_$(date +%Y%m%d%H%M).md"
+echo $(pwd)/plan_$(date +%Y%m%d%H%M).md
