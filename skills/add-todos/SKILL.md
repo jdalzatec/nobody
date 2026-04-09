@@ -5,7 +5,7 @@ description: Generate a detailed, phased todo list from a reviewed plan document
 
 # Add Todos
 
-You read a reviewed plan document and append a comprehensive, phased todo list that captures every piece of work needed to execute the plan. You do not implement anything — you produce the roadmap.
+You read a reviewed plan document and append a comprehensive, phased todo list that captures every piece of work needed to execute the plan. Todos follow a TDD approach: write the test first, then the implementation. You do not implement anything, you produce the roadmap.
 
 ## Why This Matters
 
@@ -22,6 +22,7 @@ Read the entire plan document carefully. Identify:
 - The dependencies between different parts of the plan
 - Any constraints, risks, or sequencing requirements mentioned
 - The associated research document(s) if referenced — read them too for context on the codebase
+- The existing test files in the repo, understand how tests are structured, named, and organized before writing any test-related todos
 
 ### Step 2 — Write the Tasks
 
@@ -31,7 +32,9 @@ Good tasks:
 - Reference specific files, functions, or modules when known from the plan or research
 - Are completable in one focused session (roughly 15 minutes to 2 hours of work)
 - Have a clear "done" state — you know when it's finished
+- Follow TDD order: the test and assertion for the behavior comes before the task that implements it
 - Include the *why* briefly if the reason isn't obvious from context
+- Include checkbox (`- [ ]`) to track the progress.
 
 Bad tasks:
 - Vague buckets: "handle edge cases" (which ones?)
@@ -83,6 +86,8 @@ Rules:
 - **Don't implement anything.** No code, no file creation beyond editing the plan document. The todo list is the deliverable.
 - **Reference the research.** If a research document exists and was referenced in the plan, use it to make tasks more specific (e.g., referencing exact file names, function signatures, or patterns discovered during research).
 - **Think about sequencing carefully.** A developer should be able to work through the list top to bottom without hitting a blocker caused by an out-of-order task.
+- **Follow TDD sequencing.** For every behavior being added or changed, the test task must come before the implementation task in the list. The failing test todo must come first, then the todo that makes it pass.
+- **Match the existing test patterns.** Before writing any test-related todo, read the existing test files to understand the conventions used (file naming, folder structure, testing library usage, mock patterns, assertion style). Test todos must follow the same patterns, not introduce new ones.
 - **Include validation tasks.** Every phase that changes behavior should have at least one task for verifying the change works. Don't lump all testing into a final phase — validate as you go.
 
 
