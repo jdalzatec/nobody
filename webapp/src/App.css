@@ -121,9 +121,13 @@ body {
   margin-bottom: 0;
 }
 
+.markdown-body .table-wrapper {
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
 .markdown-body table {
   width: 100%;
-  margin: 1rem 0;
   font-size: 0.875rem;
   border-collapse: collapse;
 }
