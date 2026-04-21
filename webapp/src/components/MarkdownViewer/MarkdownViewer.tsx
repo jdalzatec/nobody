@@ -27,6 +27,13 @@ function codeChildrenToPlainText(children: ReactNode): string {
 }
 
 const components: Components = {
+  table({ children }) {
+    return (
+      <div className="table-wrapper">
+        <table>{children}</table>
+      </div>
+    );
+  },
   code({ className, children, ...rest }) {
     const match = /language-(\w+)/.exec(className ?? "");
     const lang = match?.[1];
