@@ -1,4 +1,4 @@
-import { ConfigProvider } from "antd";
+import { App as AntdApp, ConfigProvider } from "antd";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -19,7 +19,9 @@ createRoot(rootEl).render(
         },
       }}
     >
-      <App />
+      <AntdApp>
+        <App />
+      </AntdApp>
     </ConfigProvider>
   </StrictMode>,
 );
