@@ -1,44 +1,37 @@
 # Nobody
 
-Nobody is a structured development workflow that keeps humans in the loop. Its skills and instructions ensure you own the architecture decisions, producing better results with significantly fewer tokens than ad-hoc AI coding.
+Nobody is a structured development workflow that keeps humans in the loop. Its skills and instructions ensure you own the architecture decisions, producing better results with significantly fewer tokens than ad-hoc AI coding. This workflow is based on the [Boris Tane pattern](https://boristane.com/blog/how-i-use-claude-code/#phase-3-implementation), read more about it if you want to understand the approach in depth.
 
 Nobody provides a workflow for AI-assisted development:
 
 ```mermaid
-flowchart TD
-    research --> annotate1[annotate];
-    annotate1 --> review1[review];
-    review1 -->|changes needed| annotate1;
-    review1 --> plan;
-    plan --> annotate2[annotate];
-    annotate2 --> review2[review];
-    review2 -->|changes needed| annotate2;
-    review2 --> todos;
-    todos --> implement;
+flowchart LR
+    A(research) --> B(annotate);
+    B --> C1{is it okay?};
+    C1 --> |YES| D(plan);
+    C1 --> |NO| E(annotate);
+    E --> F(check-notes);
+    F --> C2{is it okay?};
+    C2 --> |YES| D(plan);
+    C2 --> |NO| E(annotate);
+    D(plan) --> G(annotate);
+    G --> H{is it okay?}
+    H --> |YES| I(add-todos)
+    H --> |NO| J(annotate)
+    J --> K(check-notes);
+    K --> L{is it okay?}
+    L --> |YES| I(add-todos)
+    L --> |NO| J(annotate)
+    I --> M{is it okay?}
+    M --> |YES| N(implement)
+    M --> |NO| O(annotate)
+    O --> P(check-notes);
+    P --> Q{is it okay?}
+    Q --> |YES| N(implement)
+    Q --> |NO| O(annotate)
 ```
 
 Each stage is a skill that handles a responsibility.
-
-## Project Structure
-
-```
-nobody/
-├── skills/
-│   ├── research/
-│   ├── plan/
-│   ├── annotate/
-│   ├── review/
-│   ├── add-todos/
-│   └── implement/
-├── webapp/              # React annotation viewer
-│   ├── src/
-│   │   ├── components/  # MarkdownViewer, AnnotationSidebar, etc.
-│   │   ├── hooks/       # useAnnotations, useAnnotationLayout
-│   │   └── lib/         # api, dom-highlight, remark/rehype plugins
-│   ├── server/          # Node.js file read/write API
-│   └── Dockerfile
-└── lefthook.yml         # Git hooks (lint, typecheck, test)
-```
 
 ## Skills
 
@@ -51,36 +44,3 @@ nobody/
 | **add-todos** | `/add-todos`, "add todos", "break this into tasks"        | Converts a reviewed plan into a phased, TDD-ordered todo list. Each task specifies exactly what to do and where.                                          |
 | **implement** | `/implement`, "implement it all"                          | Executes the plan's todo list end-to-end. Does not skip tasks or pause mid-flow.                                                                          |
 
-## Webapp
-
-The annotation viewer is a React + TypeScript app served via Docker.
-
-**Key capabilities:**
-
-- Renders GitHub Flavored Markdown and Mermaid diagrams
-- Select any text to create an inline annotation
-- Annotations are shown in a sidebar with SVG connectors to the highlighted text
-- Saves annotations back to the source file as CriticMarkup (`{==text==}{>>comment<<}`)
-
-**Development:**
-
-```bash
-cd webapp
-npm install
-npm run dev
-npm run dev:api
-```
-
-## Quality Gates
-
-Git hooks run automatically via [Lefthook](https://github.com/evilmartians/lefthook):
-
-- **pre-commit**: ESLint, Prettier, Stylelint
-- **pre-push**: TypeScript type check, Vitest tests
-
-CI (GitHub Actions) runs the same checks on every push and PR to `main`, and publishes a multi-arch Docker image (
-`linux/amd64`, `linux/arm64`) on merge.
-
-## License
-
-MIT — Juan David Alzate Cardona, 2026
