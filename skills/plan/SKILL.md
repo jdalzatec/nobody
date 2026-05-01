@@ -19,7 +19,7 @@ Understand the spec thoroughly before writing anything. Pay attention to:
 - Key requirements and constraints
 - Dependencies between components, modules
 
-That should be answered from the research file plus the user prompt. If anything is unclear from the research file or the prompt, ask the user before proceeding. This is the place to resolve all open questions — don't guess.
+That should be answered from the research file plus the user prompt. If anything is unclear from the research file or the prompt, ask the user before proceeding. This is the place to resolve all open questions — don't guess. When you encounter ambiguity or confusion while shaping the plan, use the `AskUserQuestion` tool to clarify your doubts before continuing.
 
 ## Step 2: Write the plan
 
@@ -59,6 +59,7 @@ Guidelines for writing the plan:
 - **Be honest about ambiguity.** If the spec is vague on something, surface it in Step 1 rather than guessing.
 - **Keep it scannable.** The user will read this, mark it up, and come back. Short paragraphs, clear headers.
 - **Add reachable guards.** Every phase should contain guards to guarantee that the linters, typecheckers, and tests passed correctly.
+- **No git operations in phases.** Phases must not include `git commit` or `git push` steps — those are controlled by the user.
 
 After writing the file, use the `/annotate [plan name]` skill to get user annotations. Tell the user they should use `/review` after annotating the document to get a reviewed version of the plan after comments.
 
