@@ -34,6 +34,8 @@ Read the document and extract every CriticMarkup annotation. Build a list of all
 
 ### Step 2 — Address Each Annotation
 
+Before editing the document for a given annotation, decide whether you can confidently address it from the document plus the codebase. If the comment is itself a question, demands a clarification, or is ambiguous about what the user wants, use the `AskUserQuestion` tool to resolve it first. Only address the annotation in prose once you have a definite answer — do not guess and then ship a guess back to the user.
+
 Go through each annotation one by one. For each one, understand what the user is asking for and do the appropriate thing:
 
 - **"expand on this"** / **"more detail"** — add depth to the highlighted section, drawing from the codebase if needed. Re-read relevant source files to provide the missing detail.
@@ -43,8 +45,8 @@ Go through each annotation one by one. For each one, understand what the user is
 - **"wrong"** / **"incorrect"** — investigate, find the correct information, and fix the passage.
 - **"remove"** / **"not relevant"** — remove the highlighted content or section.
 - **"move this to..."** — relocate the content as requested.
-- **Questions** (anything ending in `?`) — answer the question by incorporating the answer into the document text naturally. Don't leave a Q&A — weave the answer into the prose.
-- **General observations** — use your judgment. If the comment points out a problem, fix it. If it's a suggestion, incorporate it.
+- **Questions** (anything ending in `?`) — if the answer is knowable from the document or codebase, weave it into the prose; otherwise use `AskUserQuestion` to get the answer from the user, then weave that answer into the prose. Don't leave a Q&A.
+- **General observations** — use your judgment. If the comment points out a problem, fix it. If it's a suggestion, incorporate it. If the intent is ambiguous, use `AskUserQuestion` before changing the document.
 
 When addressing a comment requires going back to the codebase, do it. Read the files, trace the flows, verify the facts. The document you are reviewing should be more accurate and complete after your review, not less.
 
@@ -83,7 +85,7 @@ Rules for the summary:
 
 ## Important Behavioral Notes
 
-- **Address every single annotation.** Don't skip any. If you're unsure what a comment means, make your best interpretation and note it in the summary.
+- **Address every single annotation.** Don't skip any. If you're unsure what a comment means, prefer `AskUserQuestion` over guessing. Fall back to your best interpretation only when the question is too trivial to interrupt the user, and note that interpretation in the summary.
 - **Don't implement code.** If a comment says "this should be fixed" about a bug described in the document, improve the document's description of the bug — don't go write a code fix.
 - **Preserve the document's structure and voice.** You're editing, not rewriting. Keep the original document style and organization unless a comment specifically asks for restructuring.
 - **Verify before you write.** If addressing a comment requires checking the codebase, check the codebase. Don't guess.
