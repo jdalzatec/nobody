@@ -19,7 +19,7 @@ Understand the spec thoroughly before writing anything. Pay attention to:
 - Key requirements and constraints
 - Dependencies between components, modules
 
-That should be answered from the research file plus the user prompt. If anything is unclear from the research file or the prompt, ask the user before proceeding. This is the place to resolve all open questions — don't guess.
+That should be answered from the research file plus the user prompt. **All ambiguity must be resolved here, before moving to Step 2.** If anything is unclear from the research file or the prompt — scope, requirements, dependencies, naming, sequencing, anything — use the `AskUserQuestion` tool to resolve it interactively. Do not guess, and do not defer the question into the plan document. The plan written in Step 2 must read as a set of decisions, not a list of open questions for the user. By the time you start writing, every question you had has an answer.
 
 ## Step 2: Write the plan
 
@@ -56,9 +56,10 @@ A 2-3 sentence summary of what this plan accomplishes and the approach taken to 
 
 Guidelines for writing the plan:
 - **Match the right level of detail.** Name the components, files, or modules that change. Use pseudocode when it helps clarify a non-obvious implementation — the user needs to think at both the architecture and implementation level.
-- **Be honest about ambiguity.** If the spec is vague on something, surface it in Step 1 rather than guessing.
+- **Resolve ambiguity before writing.** Use `AskUserQuestion` in Step 1 — never defer a question into the plan body. The plan must read as a set of decisions, not open questions. No TBDs, no "we should decide later," no questions directed at the user.
 - **Keep it scannable.** The user will read this, mark it up, and come back. Short paragraphs, clear headers.
 - **Add reachable guards.** Every phase should contain guards to guarantee that the linters, typecheckers, and tests passed correctly.
+- **No git operations in phases.** Phases must not include `git commit` or `git push` steps — those are controlled by the user.
 
 After writing the file, use the `/annotate [plan name]` skill to get user annotations. Tell the user they should use `/review` after annotating the document to get a reviewed version of the plan after comments.
 

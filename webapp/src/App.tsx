@@ -1,4 +1,4 @@
-import { Spin, Alert } from "antd";
+import { Spin, Alert, App as AntdApp } from "antd";
 import { useEffect, useState, useCallback, useRef } from "react";
 
 import { AnnotationConnectors } from "./components/AnnotationConnectors";
@@ -8,10 +8,12 @@ import { MarkdownViewer } from "./components/MarkdownViewer";
 import { useAnnotationLayout } from "./hooks/useAnnotationLayout";
 import { useAnnotations } from "./hooks/useAnnotations";
 import { fetchMarkdown, saveMarkdown } from "./lib/api";
+import { copySelectionText } from "./lib/clipboard";
 import { applyPendingHighlight } from "./lib/dom-highlight";
 import "./App.css";
 
 export function App() {
+  const { message } = AntdApp.useApp();
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -118,6 +120,16 @@ export function App() {
     const accepted = handleTextSelected(range);
     if (!accepted) return;
 
+    const selectedText = range.toString();
+    copySelectionText(selectedText)
+      .then(() => {
+        message.info("Copied to clipboard");
+      })
+      .catch((err: Error) => {
+        console.error("Failed to copy to clipboard:", err.message);
+        message.error("Failed to copy to clipboard");
+      });
+
     applyPendingHighlight(range);
     selection.removeAllRanges();
 
@@ -128,7 +140,7 @@ export function App() {
         left: rect.left - layoutRect.left,
       });
     }
-  }, [handleTextSelected]);
+  }, [handleTextSelected, message]);
 
   const handleMouseOverMarks = useCallback(
     (e: React.MouseEvent) => {
