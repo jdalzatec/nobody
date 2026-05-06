@@ -9,29 +9,18 @@ Nobody provides a workflow for AI-assisted development:
 
 ```mermaid
 flowchart LR
-    A(research) --> B(annotate);
-    B --> C1{is it okay?};
-    C1 --> |YES| D(plan);
-    C1 --> |NO| E(annotate);
-    E --> F(check-notes);
-    F --> C2{is it okay?};
-    C2 --> |YES| D(plan);
-    C2 --> |NO| E(annotate);
-    D(plan) --> G(annotate);
-    G --> H{is it okay?}
-    H --> |YES| I(add-todos)
-    H --> |NO| J(annotate)
-    J --> K(check-notes);
-    K --> L{is it okay?}
-    L --> |YES| I(add-todos)
-    L --> |NO| J(annotate)
-    I --> M{is it okay?}
-    M --> |YES| N(implement)
-    M --> |NO| O(annotate)
-    O --> P(check-notes);
-    P --> Q{is it okay?}
-    Q --> |YES| N(implement)
-    Q --> |NO| O(annotate)
+    R[research] --> A1[annotate]
+    A1 --> OK1{approved?}
+    OK1 -- no --> RV1[review] --> A1
+    OK1 -- yes --> P[plan]
+    P --> A2[annotate]
+    A2 --> OK2{approved?}
+    OK2 -- no --> RV2[review] --> A2
+    OK2 -- yes --> T[add-todos]
+    T --> A3[annotate]
+    A3 --> OK3{approved?}
+    OK3 -- no --> RV3[review] --> A3
+    OK3 -- yes --> I[implement]
 ```
 
 Each stage is a skill that handles a responsibility. As you can see, the key point is in the annotation cycle, this is
@@ -62,6 +51,20 @@ You reviewed it. You approved it. Nobody builds it.
 
 ## Philosophy
 
+The role of a software engineer is being redefined. The role is not only about writing code, it bridges the gap between abstract problem-solving and concrete technical implementation. The modern software engineer is responsible for the entire lifecycle of a digital product from conceptual design to long-term maintenance.
+
+Software engineers typically operate within a structured framework known as the SDLC. This iterative process ensures that software is developed systematically rather than haphazardly.
+
+- Planning: Defining the "what" and "why" of the project.
+
+- Design: Creating the technical blueprint.
+
+- Development: The actual construction of the software.
+
+- Testing: Verifying the software against the original requirements.
+
+- Deployment: Releasing the product and fixing bugs or adding updates over time.
+
 *Never let Claude write code until you’ve reviewed and approved a written plan.*
 
 AI is fast at generating code, but fast is not the same as right. The biggest risk in AI-assisted development is not a bug, it is building the wrong thing confidently. Nobody is designed around that risk.
@@ -69,4 +72,6 @@ AI is fast at generating code, but fast is not the same as right. The biggest ri
 The workflow forces a pause at every meaningful decision: after research, after planning, after breaking work into tasks. Each pause is an annotation cycle where you read, question, and push back before anything is built. The AI cannot skip these gates. You own the direction. You own the architecture. You own the design.
 
 This also keeps the mental model in your head, not just in the output. When you annotate a plan you are not just approving it you are understanding it, and making sure the AI understands it too, before any implementation effort is spent. That understanding is what lets you catch mistakes, redirect scope, and reason about the system long after the session ends.
+
+Another important point, consist on making work digestible for the human: research, plans, and to-dos lists that are easy to read, easy to annotate, and easy to reason about. For large or open-ended tasks the workflow still applies, but the annotation cycles become more demanding, more steps, more energy, more precision required from you before anything moves forward.
 
