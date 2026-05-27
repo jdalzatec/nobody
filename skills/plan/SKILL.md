@@ -1,7 +1,6 @@
 ---
 name: plan
-description: >
-  Use this skill whenever the user wants to create an implementation plan, break a new feature down into components, or plan code changes. Triggers when the user says "/plan", "plan this", or references planning work from a research document along with a feature prompt.
+description: Generates an implementation plan from a research document and a feature prompt, iterating with the user via annotation/review until satisfied. Use when the user says "/plan", "plan this", or asks to break a feature into components and phases.
 ---
 
 # Plan
@@ -23,10 +22,10 @@ That should be answered from the research file plus the user prompt. **All ambig
 
 ## Step 2: Write the plan
 
-Use the following script to get the plan name:
+Use the following command to get the plan name:
 
 ```sh
-bash scripts/new-plan-name.sh
+echo "$(pwd)/plan_$(date +%Y%m%d%H%M).md"
 ```
 
 Create the plan document in the current working directory with this structure:
@@ -61,7 +60,7 @@ Guidelines for writing the plan:
 - **Add reachable guards.** Every phase should contain guards to guarantee that the linters, typecheckers, and tests passed correctly.
 - **No git operations in phases.** Phases must not include `git commit` or `git push` steps — those are controlled by the user.
 
-After writing the file, use the `/annotate [plan name]` skill to get user annotations. Tell the user they should use `/review` after annotating the document to get a reviewed version of the plan after comments.
+After writing the file, hand off to the annotate skill with the plan's path as the argument to get user annotations. Tell the user they should use `/review` after annotating the document to get a reviewed version of the plan after comments.
 
 ## The loop
 

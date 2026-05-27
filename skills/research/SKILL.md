@@ -30,12 +30,12 @@ Feel free to show code snippets, mermaid diagrams, dependency trees, or any othe
 When research is complete, generate the report file name:
 
 ```sh
-bash scripts/new-research-name.sh
+echo "$(pwd)/research_$(date +%Y%m%d%H%M).md"
 ```
 
 ## After Writing the Report
 
-Present the report to the user using /annotate <research-filename> so they can read and annotate it interactively.
+Hand off to the annotate skill with the report's path as the argument so the user can read and annotate it interactively.
 
 ## Important Behavioral Notes
 
