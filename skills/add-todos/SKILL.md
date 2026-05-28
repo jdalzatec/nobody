@@ -93,4 +93,4 @@ Rules:
 
 ## After adding todos
 
-After adding all the todos to the plan, the user may want to annotate the new plan version. So, use the `/annotate plan-file.md` skill to serve the new document to the user and they can add more notes.
+After adding all the todos to the plan, the user may want to annotate the new plan version. Hand off to the annotate skill with the plan's path as the argument so they can add more notes.

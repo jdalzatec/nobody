@@ -1,7 +1,6 @@
 ---
 name: implement
-description: >
-  Use this skill to execute an implementation plan end-to-end. Triggers when the user says "/implement", "implement it", "implement it all", or references implementing a plan document. Do NOT use for planning, research, or reviewing annotations, this skill only executes code changes.
+description: Executes an existing plan_*.md end-to-end without stopping for confirmation between phases. Use when the user says "/implement", "implement it", or "implement the plan". Not for planning, research, or annotation review.
 ---
 
 # Implement

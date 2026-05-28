@@ -9,9 +9,11 @@ description: Launch the nobody webapp to view a markdown file in the browser. Us
 
 Runs a Docker container that serves a formatted, readable view of a markdown file in the browser.
 
-## Inputs
+## Arguments
 
-The user provides a **markdown file path**, e.g. `/annotate research_20260402_0000.md`
+`file` (required) — Absolute or working-directory-relative path to a markdown file. The webapp mounts this path read-write; annotations are persisted back to it.
+
+Invoked as: `/annotate <file>`
 
 ## Workflow
 
