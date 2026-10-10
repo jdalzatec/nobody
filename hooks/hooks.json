@@ -6,7 +6,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "docker stop nobody"
+                        "command": "${CLAUDE_PLUGIN_ROOT}/skills/annotate/scripts/session-end.sh"
                     }
                 ]
             }

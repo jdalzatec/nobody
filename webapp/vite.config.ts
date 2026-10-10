@@ -6,7 +6,6 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": "http://localhost:3001",
-      "/file.md": "http://localhost:3001",
     },
   },
 });

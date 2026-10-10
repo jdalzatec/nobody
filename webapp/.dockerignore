@@ -2,3 +2,5 @@ node_modules
 .git
 *.md
 dist
+dev-state
+dev-projects

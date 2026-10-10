@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:api": "FILE_PATH=./file.md node server/api.mjs",
+    "dev:api": "STATE_DIR=./dev-state PROJECTS_DIR=./dev-projects node server/api.mjs",
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "test:watch": "vitest",

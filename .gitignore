@@ -138,3 +138,7 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+webapp/dev-projects/*/*.local.md
+webapp/dev-state/.lock/
+webapp/dev-state/*.tmp-*
