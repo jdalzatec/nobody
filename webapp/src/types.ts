@@ -5,3 +5,11 @@ export interface Annotation {
   sourceStart: number;
   sourceEnd: number;
 }
+
+export interface Doc {
+  id: string;
+  title: string;
+  filename: string;
+  dirPath: string;
+  dirLabel: string;
+}

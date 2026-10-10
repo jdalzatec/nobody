@@ -12,7 +12,7 @@ import type { ESLint } from "eslint";
 
 export default defineConfig(
   {
-    ignores: ["dist/**", "coverage/**", "node_modules/**", "server/**"],
+    ignores: ["dist/**", "coverage/**", "node_modules/**", "dev-projects/**"],
   },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
@@ -95,6 +95,21 @@ export default defineConfig(
       vitest: {
         typecheck: true,
       },
+    },
+  },
+  {
+    // Plain Node ESM, deliberately outside tsconfig — type-aware rules cannot apply.
+    files: ["server/**/*.mjs"],
+    ...tseslint.configs.disableTypeChecked,
+  },
+  {
+    files: ["server/**/*.{test,spec}.mjs"],
+    plugins: {
+      vitest: vitestPlugin,
+    },
+    rules: {
+      ...vitestPlugin.configs.recommended.rules,
+      "vitest/no-focused-tests": "error",
     },
   },
   eslintConfigPrettier,

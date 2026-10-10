@@ -9,7 +9,9 @@ This file provides guidance to Claude Code when working with code in this reposi
 1. **`skills/`** — six prose-based skills (`research`, `plan`, `annotate`, `review`, `add-todos`, `implement`) that drive the workflow. These are markdown instruction files with frontmatter, not code. Editing them changes how Claude behaves at each stage.
 2. **`webapp/`** — a React + TypeScript annotation viewer served via Docker on port 9303. This is the only stage of the workflow that runs real code; it renders the markdown artifacts produced by the skills and lets the user write CriticMarkup annotations back to the source file through a Node.js read/write API.
 
-The two parts are coupled only at one seam: the `annotate` skill shells out to `skills/annotate/scripts/run-annotator.sh`, which pulls and runs the published Docker image (`jdalzatec/nobody-webapp:latest`) with the markdown file mounted read-write.
+The two parts are coupled only at one seam: the `annotate` skill shells out to `skills/annotate/scripts/run-annotator.sh`, which runs the published Docker image (`jdalzatec/nobody-webapp:latest`) with the document's **parent directory** mounted read-write.
+
+The container is **shared across Claude sessions**. One instance named `nobody` serves every open document; it is started on the first `/annotate`, reused afterwards, and stopped only when the last session using it ends.
 
 ## The workflow (so changes don't break the contract)
 
@@ -44,7 +46,7 @@ All webapp commands run from `webapp/`:
 
 ```bash
 npm run dev          # Vite dev server (frontend)
-npm run dev:api      # Node.js file API on port 3001 (FILE_PATH defaults to ./file.md)
+npm run dev:api      # Node.js API on port 3001 against the dev-state/dev-projects fixtures
 npm run build        # tsc -b && vite build
 npm run typecheck    # tsc -b --noEmit
 npm run lint         # ESLint, --max-warnings 0
@@ -61,23 +63,25 @@ Run a single test by name: `npx vitest run -t "name pattern"`
 
 ## Webapp architecture
 
-The frontend renders a markdown file fetched from `/api/file` (proxied to the Node API on port 3001) and lets the user select text to create CriticMarkup annotations.
+The frontend lists every open document in a left rail, renders the selected one (fetched from `/api/docs/:id`, proxied to the Node API on port 3001), and lets the user select text to create CriticMarkup annotations. The active document lives in the URL as `/d/:id`.
 
 ```
 webapp/
 ├── src/
-│   ├── App.tsx                      # Top-level layout: viewer + sidebar + connectors
+│   ├── App.tsx                      # Rail + viewer + sidebar; /d/:id routing
 │   ├── components/
+│   │   ├── DocRail/                 # Left column: open docs grouped by directory
 │   │   ├── MarkdownViewer/          # react-markdown + remark-gfm + rehype-raw rendering
 │   │   ├── AnnotationSidebar/       # Sidebar panels per annotation
 │   │   ├── AnnotationConnectors/    # SVG lines linking text spans to sidebar items
 │   │   ├── AnnotationPopover/       # On-selection comment composer
 │   │   └── MermaidBlock/            # Mermaid diagram renderer
 │   ├── hooks/
+│   │   ├── useDocs/                 # Fetch the open-document list
 │   │   ├── useAnnotations/          # Load/save annotations against the API
 │   │   └── useAnnotationLayout/     # Position connectors and sidebar entries
 │   └── lib/
-│       ├── api.ts                   # GET/PUT /api/file
+│       ├── api.ts                   # GET /api/docs, GET/PUT /api/docs/:id
 │       ├── remark-critic-markup.ts  # Parses {==text==}{>>comment<<} into AST nodes
 │       ├── rehype-source-positions.ts # Tags rendered nodes with source offsets
 │       ├── annotation-ops.ts        # Insert/remove CriticMarkup at source offsets
@@ -85,18 +89,34 @@ webapp/
 │       ├── selection-validator.ts   # Validate user text selections
 │       ├── dom-highlight.ts         # Apply visual highlights to rendered DOM
 │       └── clipboard.ts             # Copy-selected-text helper
+├── dev-state/registry.json          # Committed dev fixture (machine-independent ids)
+├── dev-projects/devproject01/       # Fixture documents for `npm run dev:api`
 └── server/
-    └── api.mjs                      # 45-line Node http server: GET/PUT /api/file
+    ├── api.mjs                      # Registry-driven http server, three routes
+    └── registry-cli.mjs             # Registry read/write CLI, also runs in-container
 ```
 
 Key data flow:
 
-1. `useAnnotations` hook fetches the markdown via `lib/api.ts → GET /api/file`.
-2. `MarkdownViewer` renders it with the `remark-critic-markup` and `rehype-source-positions` plugins so each rendered node knows its byte offset in the source.
-3. When the user selects text, `AnnotationPopover` collects a comment and `lib/annotation-ops.ts` inserts the CriticMarkup pair at the correct source offset.
-4. The mutated source is persisted via `PUT /api/file`, which the Node server writes to `$FILE_PATH` (defaults to `/data/file.md` in the Docker container, `./file.md` in dev).
+1. `useDocs` fetches `GET /api/docs`; `App.tsx` reads the active id from `/d/:id`.
+2. `useAnnotations` fetches that document via `lib/api.ts → GET /api/docs/:id`.
+3. `MarkdownViewer` renders it with the `remark-critic-markup` and `rehype-source-positions` plugins so each rendered node knows its byte offset in the source.
+4. When the user selects text, `AnnotationPopover` collects a comment and `lib/annotation-ops.ts` inserts the CriticMarkup pair at the correct source offset.
+5. The mutated source is persisted via `PUT /api/docs/:id`, which the Node server writes to `$PROJECTS_DIR/<dirId>/<filename>`.
 
-The server is intentionally minimal: read/write a single file, no auth, no multi-file support. It runs inside the Docker image alongside an Nginx serving the built frontend (`nginx.conf`).
+### The registry
+
+`~/.nobody/registry.json` on the host is the source of truth for which documents are open and which sessions own them. It is mounted read-only at `/state` and **re-read on every request**, which is why a document added to an already-mounted directory appears without restarting the container.
+
+Rules that are load-bearing:
+
+- **The registry stores identity and ownership only, never derived data.** A document's rail title is derived from its first `# heading` at read time. Caching it would go stale the moment `/review` rewrites the document.
+- **Only the document's immediate parent directory is mounted** — never the git root, never `$HOME`. `run-annotator.sh` refuses dangerous parents outright.
+- **The registry can go stale but never wrong.** A deleted document is filtered out of `GET /api/docs` at read time and pruned from the JSON on the next mutation.
+- **Liveness is probed on the host, not in the CLI.** The CLI container has no host PID namespace and no view of the project directories, so `run-annotator.sh` and `session-end.sh` compute the verdicts and pass `--dead` / `--missing`.
+- `resolveDoc` in `api.mjs` is the security boundary: realpath containment, 404/400/403/410. `PUT` returns 410 rather than recreating a deleted file.
+
+The server has no auth and is published on `127.0.0.1` only. It runs inside the Docker image alongside an Nginx serving the built frontend (`nginx.conf`).
 
 ## Quality gates
 
@@ -114,4 +134,7 @@ When modifying a `skills/*/SKILL.md`:
 - The frontmatter `description` is what Claude Code uses to decide when to trigger the skill. Keep it explicit about triggers and anti-triggers.
 - Each skill is meant to be **narrow**. The contract between skills is the file artifacts in the cwd, not in-conversation state. Don't add cross-skill coordination beyond the existing handoff calls.
 - The `implement` skill's "do not invoke other skills" rule is load-bearing — it is what makes implementation a single mechanical pass. Don't relax it.
-- The annotation viewer is a single-instance container named `nobody`. The `SessionEnd` hook in `hooks/hooks.json` runs `docker stop nobody`, so anything that changes the container name must update both files.
+- The annotation viewer is a single shared container named `nobody`, used by **all** concurrent Claude sessions. The `SessionEnd` hook in `hooks/hooks.json` calls `skills/annotate/scripts/session-end.sh`, which deregisters the closing session and stops the container **only when no session is left**. Never make that hook stop the container unconditionally — that is the bug it exists to fix.
+- `run-annotator.sh` and `session-end.sh` share `skills/annotate/scripts/registry-lib.sh`. Container name, port, image, and state dir are defined there once; changing any of them means changing that file, not the two scripts.
+- `registry_cli` must pass `--entrypoint node` to `docker run`. The image's default entrypoint starts nginx in the foreground and would hang instead of running the CLI.
+- The launcher reuses the running container whenever its mounts already cover what is needed. Only a **new directory** forces a recreate, so adding a document to a known project must never restart it.
