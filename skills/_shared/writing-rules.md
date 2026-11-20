@@ -1,10 +1,10 @@
 # Writing rules
 
-Shared writing rules for every Nobody skill. Plain wording makes a text faster and easier to read for every reader. Each skill says which level to use.
+Shared writing rules. Plain wording makes a text faster and easier to read for every reader. Whoever references this file says which sections to apply, and can adjust them.
 
-- **Section 1** applies to all output: documents and chat messages.
-- **Section 2** applies to documents and chat messages that are not a teaching explanation: research reports, plans, todo lists, code reviews, review summaries, implementation reports.
-- **Section 3** (full ASD-STE100) applies only to the `explain` skill.
+- **Section 1** (no verbosity) is the base level for documents and chat messages.
+- **Section 2** (plain technical English) is for technical documents and messages for an expert reader.
+- **Section 3** (full ASD-STE100) is the strictest level, for text where the reader must not misread any sentence.
 
 These rules control the wording, not the content. Never remove depth, precision, or technical detail to make the text shorter or simpler. If a sentence is long because the idea is complex, split the idea into more sentences. Do not cut the idea.
 
@@ -18,7 +18,7 @@ Every sentence must give the reader information. Remove the sentences that do no
 - No praise or filler. Do not write "This is a great approach" or "It is worth noting that".
 - No meta-comments. Do not write "Now let's move on to…", "In this section I will…", or "As mentioned above…".
 - No repetition. Say each point one time, in the place where it belongs. Do not recap the previous section or message.
-- No closing summary that repeats the body, unless the skill asks for a summary.
+- No closing summary that repeats the body, unless a summary is requested.
 - No hedging chains. Write "X can fail if Y", not "It might be possible that X could potentially fail".
 - Prefer a list or a table to a long paragraph when the content is a set of parallel items.
 
@@ -52,7 +52,7 @@ Paragraphs and connections:
 
 ## 3. Full ASD-STE100
 
-Use this level only for the `explain` skill. Use it for every message you send while the skill runs: the explanation, the questions, the feedback, and the answers to the questions of the user. Section 1 also applies.
+Use this level for every part of the text it applies to, including answers to follow-up questions. Section 1 also applies.
 
 Words:
 
