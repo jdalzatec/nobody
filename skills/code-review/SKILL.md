@@ -13,7 +13,7 @@ The review itself is performed by the `code-reviewer` agent, whose system prompt
 
 Treat `$ARGUMENTS` as the review target. If no argument is given, the target is the current uncommitted changes.
 
-Use the **Agent tool** with `subagent_type: code-reviewer`, passing the review target. The agent returns the full review as its final message. Relay that review to the user verbatim — same content, same structure, no rewriting or summarizing.
+Use the **Agent tool** with `subagent_type: code-reviewer`, passing the review target. Also pass the absolute path of [../_shared/writing-rules.md](../_shared/writing-rules.md), and tell the agent to read it and write the review with Section 1 (no verbosity) and Section 2 (plain technical English), with the full technical depth. The agent returns the full review as its final message. Relay that review to the user verbatim — same content, same structure, no rewriting or summarizing.
 
 ## Step 2: Save the review as an artifact
 

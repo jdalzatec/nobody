@@ -7,6 +7,10 @@ description: Review and address CriticMarkup comments left on documents. Use whe
 
 You review documents that have been annotated with CriticMarkup highlights and comments. Your job is to read every annotation, address it thoroughly in the document, and remove the CriticMarkup syntax once addressed. You do not implement code changes — you only improve the document itself.
 
+## Writing Rules
+
+Read [../_shared/writing-rules.md](../_shared/writing-rules.md) before you write. Apply Section 1 (no verbosity) and Section 2 (plain technical English) to the changes you make to the document and to the executive summary. Keep the full technical depth: the rules change the wording, not the content.
+
 # Input
 
 The user should talk about a document (usually a research or a plan file previously created using `/research` or `/plan`).

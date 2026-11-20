@@ -25,6 +25,10 @@ Think like a code auditor who onboards to unfamiliar projects daily: you need to
 
 Feel free to show code snippets, mermaid diagrams, dependency trees, or any other visual artifact inline in the report when they clarify relationships or flows that are hard to convey in prose alone. A well-placed diagram of a call chain or a simplified dependency graph can save paragraphs of explanation. Use these judiciously — they should illuminate, not decorate.
 
+## Writing Rules
+
+Read [../_shared/writing-rules.md](../_shared/writing-rules.md) before you write. Apply Section 1 (no verbosity) and Section 2 (plain technical English) to the report and to your chat messages. Keep the full technical depth: the rules change the wording, not the content.
+
 ## Research Output
 
 When research is complete, generate the report file name:

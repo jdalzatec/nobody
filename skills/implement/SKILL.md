@@ -24,6 +24,10 @@ These rules are non-negotiable. Follow them exactly:
 - **Do not use `any` types.** Maintain strict typing throughout.
 - **Do not invoke other skills.** Do not use `/annotate`, `/review`, `/plan`, `/research`, or any other skill during implementation. This skill runs alone, start to finish.
 
+## Writing Rules
+
+Read [../_shared/writing-rules.md](../_shared/writing-rules.md) before you write. Apply Section 1 (no verbosity) and Section 2 (plain technical English) to your chat messages and the executive report. They do not apply to code. Keep the full technical depth: the rules change the wording, not the content.
+
 ## Workflow
 
 ### Step 1 - Read the plan

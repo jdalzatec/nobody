@@ -9,6 +9,10 @@ You turn a deep understanding of the entire project, or a part of it (`research_
 
 The goal is a plan that captures *what* needs to change and *why*. Think of it as the bridge between "here's what we have" and "here's how we'll build the new feature." It can evolve through review annotations.
 
+## Writing Rules
+
+Read [../_shared/writing-rules.md](../_shared/writing-rules.md) before you write. Apply Section 1 (no verbosity) and Section 2 (plain technical English) to the plan and to your chat messages. Keep the full technical depth: the rules change the wording, not the content.
+
 ## Step 1: Read the research
 
 Read the research file created in the current session, this file should exist. If it does not exist, notify the user about this.
