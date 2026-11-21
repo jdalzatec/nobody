@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Shared helpers for run-annotator.sh and session-end.sh.
 #
-# Both scripts need the identical host-side liveness probes. Duplicating them is
-# how the two would eventually disagree about what "dead" means, so they live
-# here and are sourced by both.
+# Both scripts need the same container settings and registry_cli wrapper, so
+# they live here and are sourced by both. The liveness probes below are used by
+# run-annotator.sh; session-end.sh has too little time for extra container
+# calls and passes --alive-pids to deregister instead.
 
 NOBODY_IMAGE="${NOBODY_IMAGE:-jdalzatec/nobody-webapp:latest}"
 NOBODY_CONTAINER="${NOBODY_CONTAINER:-nobody}"

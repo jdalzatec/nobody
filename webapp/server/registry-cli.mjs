@@ -19,7 +19,9 @@ const USAGE = `usage: registry-cli <command> [options]
   docs       --paths
 
   Mutating commands also accept --dead <sessionId>,... and --missing <docId>,...
-  Liveness is probed by the host and passed in; this CLI never probes it.`;
+  and --alive-pids <pid>,..., which marks every session whose pid is not
+  listed as dead. Liveness is probed by the host and passed in; this CLI never
+  probes it.`;
 
 const stateDir = () => env.STATE_DIR || "/state";
 const registryPath = () => join(stateDir(), "registry.json");
@@ -126,10 +128,20 @@ function keepKeys(record, keep) {
   return Object.fromEntries(Object.entries(record).filter(([key]) => keep.has(key)));
 }
 
+// A session with no recorded pid (0) is never judged dead from a pid list,
+// matching the host probe, where `kill -0 0` always succeeds.
+function deadFromAlivePids(sessions, alivePids) {
+  if (!alivePids) return [];
+  return Object.entries(sessions)
+    .filter(([, session]) => session.pid > 0 && !alivePids.has(String(session.pid)))
+    .map(([sessionId]) => sessionId);
+}
+
 // Liveness rules, in order: dead sessions go, missing docs go, docs with no
 // remaining owner go, dirs with no remaining doc go.
-function prune(registry, { dead = [], missing = [] } = {}) {
-  const survivingSessions = omitKeys(registry.sessions, new Set(dead));
+function prune(registry, { dead = [], missing = [], alivePids = null } = {}) {
+  const deadSessions = new Set([...dead, ...deadFromAlivePids(registry.sessions, alivePids)]);
+  const survivingSessions = omitKeys(registry.sessions, deadSessions);
   const presentDocs = omitKeys(registry.docs, new Set(missing));
 
   const owned = new Set();
@@ -180,7 +192,12 @@ function requireOption(options, name) {
 }
 
 function verdicts(options) {
-  return { dead: splitList(options.dead), missing: splitList(options.missing) };
+  const alive = options["alive-pids"];
+  return {
+    dead: splitList(options.dead),
+    missing: splitList(options.missing),
+    alivePids: typeof alive === "string" ? new Set(splitList(alive)) : null,
+  };
 }
 
 function cmdRegister(options) {
