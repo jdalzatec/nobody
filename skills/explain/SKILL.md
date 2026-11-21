@@ -50,7 +50,9 @@ Send one short message with:
 1. Start with a concrete case. Then give the general rule.
 2. If a familiar system operates in the same way, use it as an analogy. Show the similarities clearly. Tell the user where the analogy is not correct.
 3. If a misconception is probable, use the refutation structure:
-   1. Give the misconception: "Many people think that X."
+   1. Give the misconception. Do not claim that other people believe it, unless a reliable source shows that the misconception is common. Select the wording:
+      - Documented misconception of a general topic, with a source: "A common misconception is that X."
+      - All other cases, for example a project, a file, or a PR: "A possible confusion is that X."
    2. Say clearly that X is not correct.
    3. Give the correct explanation and the reason.
 4. Write the key sentence in **bold**. Use only one bold sentence in each segment.
