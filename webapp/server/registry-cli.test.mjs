@@ -236,6 +236,28 @@ describe("deregister", () => {
 });
 
 describe("pruning", () => {
+  it("drops sessions whose pid is missing from --alive-pids", () => {
+    register("/repos/proj/plan.md", { session: "dead-one", pid: 111 });
+    register("/repos/other/notes.md", { session: "live-one", pid: 222 });
+    register("/repos/other/notes.md", { session: "closing", pid: 333 });
+    expect(main(["deregister", "--session", "closing", "--alive-pids", "1,222,"]).trim()).toBe("1");
+    const raw = readRaw();
+    expect(Object.keys(raw.sessions)).toEqual(["live-one"]);
+    expect(Object.values(raw.dirs).map((d) => d.path)).toEqual(["/repos/other"]);
+  });
+
+  it("never judges a session without a recorded pid dead from --alive-pids", () => {
+    register("/repos/proj/plan.md", { session: "no-pid", pid: 0 });
+    main(["prune", "--alive-pids", "1"]);
+    expect(readRaw().sessions["no-pid"]).toBeDefined();
+  });
+
+  it("drops every session with a pid when --alive-pids is empty", () => {
+    register("/repos/proj/plan.md", { session: "s1", pid: 111 });
+    main(["prune", "--alive-pids", ""]);
+    expect(readRaw().sessions).toEqual({});
+  });
+
   it("drops a dead session and its now-orphaned docs", () => {
     register("/repos/proj/plan.md", { session: "dead-one" });
     register("/repos/other/notes.md", { session: "live-one" });

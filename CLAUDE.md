@@ -113,7 +113,7 @@ Rules that are load-bearing:
 - **The registry stores identity and ownership only, never derived data.** A document's rail title is derived from its first `# heading` at read time. Caching it would go stale the moment `/review` rewrites the document.
 - **Only the document's immediate parent directory is mounted** — never the git root, never `$HOME`. `run-annotator.sh` refuses dangerous parents outright.
 - **The registry can go stale but never wrong.** A deleted document is filtered out of `GET /api/docs` at read time and pruned from the JSON on the next mutation.
-- **Liveness is probed on the host, not in the CLI.** The CLI container has no host PID namespace and no view of the project directories, so `run-annotator.sh` and `session-end.sh` compute the verdicts and pass `--dead` / `--missing`.
+- **Liveness is probed on the host, not in the CLI.** The CLI container has no host PID namespace and no view of the project directories, so `run-annotator.sh` computes the verdicts and passes `--dead` / `--missing`. `session-end.sh` passes the host's live PIDs as `--alive-pids` instead, because Claude Code cancels SessionEnd hooks after about 1.5 s and each CLI call starts a container. Keep that hook to a single `registry_cli` call.
 - `resolveDoc` in `api.mjs` is the security boundary: realpath containment, 404/400/403/410. `PUT` returns 410 rather than recreating a deleted file.
 
 The server has no auth and is published on `127.0.0.1` only. It runs inside the Docker image alongside an Nginx serving the built frontend (`nginx.conf`).
