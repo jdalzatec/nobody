@@ -11,6 +11,10 @@ You read a reviewed plan document and append a comprehensive, phased todo list t
 
 A plan describes *what* and *why*. The todo list bridges the gap to *how* and *in what order*. A good todo list means a developer can pick up the first unchecked item and start working without re-reading the entire plan. A bad one is either too vague ("implement the feature") or too granular ("create the variable"). You're aiming for the sweet spot: each task is a single, concrete unit of work that a developer can complete and check off in one focused session.
 
+## Writing Rules
+
+Read [../_shared/writing-rules.md](../_shared/writing-rules.md) before you write. Apply Section 1 (no verbosity) and Section 2 (plain technical English) to the todo list and to your chat messages. Keep the full technical depth: the rules change the wording, not the content.
+
 ## Workflow
 
 ### Step 1 — Understand the Plan
